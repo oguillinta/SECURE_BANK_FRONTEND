@@ -62,24 +62,20 @@ export class MainLayoutComponent {
 
   onMenuItemClick(item: any) {
     console.log('Navigate to:', item.route);
-    // Navigation logic will be implemented later
     this.router.navigate([item.route]);
   }
 
   onNotificationClick() {
     console.log('Show notifications');
-    // Notification logic will be implemented later
   }
 
   onProfileClick() {
     console.log('Show profile menu');
-    // Profile menu logic will be implemented later
   }
 
   onLogout() {
     console.log('Logout user');
     this.keycloak.logout();
-    // Logout logic will be implemented later
   }
 
   async loadUserProfile() {

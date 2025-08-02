@@ -5,7 +5,6 @@ import Keycloak from 'keycloak-js';
   providedIn: 'root',
 })
 export class AuthService {
-  // Direct injection of Keycloak instance (new way)
   private readonly keycloak = inject(Keycloak);
 
   getToken(): string | undefined {

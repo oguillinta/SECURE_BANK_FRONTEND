@@ -59,8 +59,6 @@ export class CustomerListComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private customerService = inject(CustomerService);
-  // Uncomment when you have the service ready
-  // private customerService = inject(CustomerService);
 
   searchForm!: FormGroup;
   customers: GetAllCustomersResponse[] = [];
@@ -97,9 +95,6 @@ export class CustomerListComponent {
   }
 
   private loadCustomers(): void {
-    // For now, load sample data. Uncomment the API call when your service is ready.
-
-    // API call version:
     this.customerService.getAll().subscribe({
       next: (customers: GetAllCustomersResponse[]) => {
         console.log('Customers loaded:', customers);
@@ -113,12 +108,8 @@ export class CustomerListComponent {
           duration: 3000,
           panelClass: ['error-snackbar'],
         });
-        //this.loadSampleData();
       },
     });
-
-    // For now, use sample data
-    //this.loadSampleData();
   }
 
   private loadSampleData(): void {
@@ -176,7 +167,6 @@ export class CustomerListComponent {
       (c) => c.status === 'ACTIVE'
     ).length;
 
-    // Calculate new customers this month
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     this.newThisMonth = this.customers.filter((c) => {
@@ -282,14 +272,11 @@ export class CustomerListComponent {
 
   onEditCustomer(customer: Customer): void {
     console.log('Edit customer:', customer.customerId);
-    // Navigate to customer edit
     this.router.navigate(['/customer-update', customer.customerId]);
   }
 
   onViewAccounts(customer: Customer): void {
     console.log('View accounts for customer:', customer.customerId);
-    // Navigate to customer accounts
-    // this.router.navigate(['/customers', customer.customerId, 'accounts']);
   }
 
   onCreateAccount(customer: Customer): void {
@@ -301,13 +288,10 @@ export class CustomerListComponent {
 
   onViewTransactions(customer: Customer): void {
     console.log('View transactions for customer:', customer.customerId);
-    // Navigate to customer transactions
-    // this.router.navigate(['/customers', customer.customerId, 'transactions']);
   }
 
   onSuspendCustomer(customer: Customer): void {
     console.log('Suspend customer:', customer.customerId);
-    // Implement suspend logic
     this.snackBar.open(
       `Customer ${customer.firstName} ${customer.lastName} has been suspended`,
       'Close',
@@ -317,7 +301,6 @@ export class CustomerListComponent {
 
   onActivateCustomer(customer: Customer): void {
     console.log('Activate customer:', customer.customerId);
-    // Implement activate logic
     this.snackBar.open(
       `Customer ${customer.firstName} ${customer.lastName} has been activated`,
       'Close',
@@ -327,13 +310,10 @@ export class CustomerListComponent {
 
   onCreateNewCustomer(): void {
     console.log('Create new customer');
-    // Navigate to customer creation
-    // this.router.navigate(['/customers/create']);
   }
 
   onExportCustomers(): void {
     console.log('Export customers');
-    // Implement export logic
     this.snackBar.open('Exporting customer data...', 'Close', {
       duration: 3000,
       panelClass: ['info-snackbar'],

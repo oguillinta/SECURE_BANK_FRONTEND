@@ -53,7 +53,6 @@ export class AccountListComponent implements OnInit {
 
   ngOnInit() {
     this.calculateTotals();
-    //this.loadAccountsByCustomerId('BUS-4567890123');
     this.loadAccountsByCustomerEmail();
     this.authService.getToken();
   }
@@ -145,33 +144,27 @@ export class AccountListComponent implements OnInit {
 
   onViewStatement(account: AccountSummary) {
     console.log('View statement for account:', account.accountNumber);
-    // Navigate to statement view
   }
 
   onTransfer(account: AccountSummary) {
     console.log('Transfer from account:', account.accountNumber);
-    // Navigate to transfer page
   }
 
   onPayBills(account: AccountSummary) {
     console.log('Pay bills from account:', account.accountNumber);
-    // Navigate to bill payment
   }
 
   onAccountDetails(account: AccountSummary) {
     console.log('View details for account:', account.accountNumber);
-    // Navigate to account details
   }
 
   onDownloadStatement(account: AccountSummary) {
     console.log('Download statement for account:', account.accountNumber);
-    // Download statement logic
   }
 
   onFreezeAccount(account: AccountSummary) {
     console.log('Freeze account:', account.accountNumber);
     this.router.navigate(['/account-freeze', account.accountNumber]);
-    // Account freeze logic
   }
 
   onOpenNewAccount() {

@@ -59,7 +59,6 @@ export class AccountSummaryComponent {
   private loadAccountsSummary(): void {
     this.isLoading = true;
 
-    // Call the actual API when ready
     this.accountService.getAccountsSummary().subscribe({
       next: (response: AccountSummaryReport[]) => {
         console.log('Accounts summary loaded:', response);
@@ -78,9 +77,6 @@ export class AccountSummaryComponent {
         this.loadSampleData();
       },
     });
-
-    // Load sample data for now - comment this out when using real API
-    // this.loadSampleData();
   }
 
   private calculateTotals(): void {
@@ -125,14 +121,12 @@ export class AccountSummaryComponent {
   }
 
   private prepareChartData(): void {
-    // Prepare data for account count chart
     this.chartData = this.summaryData.map((item) => ({
       name: this.getAccountTypeLabel(item.accountType),
       value: item.totalAccounts,
       color: this.getAccountTypeColor(item.accountType),
     }));
 
-    // Prepare data for balance distribution chart
     this.balanceChartData = this.summaryData.map((item) => ({
       name: this.getAccountTypeLabel(item.accountType),
       value: item.totalBalance,
@@ -188,7 +182,6 @@ export class AccountSummaryComponent {
 
   onExportReport(): void {
     console.log('Exporting accounts summary report...');
-    // Implement export functionality
     this.snackBar.open('Report export started...', 'Close', {
       duration: 3000,
       panelClass: ['info-snackbar'],
@@ -197,7 +190,6 @@ export class AccountSummaryComponent {
 
   onViewAccountDetails(accountType: string): void {
     console.log('View details for account type:', accountType);
-    // Navigate to detailed view for specific account type
     this.router.navigate(['/accounts'], {
       queryParams: { type: accountType },
     });
@@ -205,7 +197,6 @@ export class AccountSummaryComponent {
 
   onGenerateDetailedReport(): void {
     console.log('Generate detailed report...');
-    // Navigate to detailed report generation
     this.snackBar.open('Generating detailed report...', 'Close', {
       duration: 3000,
       panelClass: ['info-snackbar'],

@@ -243,7 +243,6 @@ export class CustomerUpdateComponent implements OnInit {
         status: this.customerForm.get('status')?.value,
       };
 
-      // Call the actual API when ready
       this.customerService.updateCustomerProfile(updateRequest).subscribe({
         next: (updatedCustomer: UpdateCustomerResponse) => {
           console.log('Customer updated:', updatedCustomer);
@@ -271,29 +270,6 @@ export class CustomerUpdateComponent implements OnInit {
           });
         },
       });
-
-      // Simulate API call for now
-      // setTimeout(() => {
-      //   const updatedCustomer: Customer = {
-      //     ...this.currentCustomer!,
-      //     firstName: updateRequest.firstName,
-      //     lastName: updateRequest.lastName,
-      //     email: updateRequest.email,
-      //     customerType: updateRequest.customerType,
-      //     status: updateRequest.status,
-      //     updatedAt: new Date(),
-      //   };
-
-      //   this.currentCustomer = updatedCustomer;
-      //   this.isLoading = false;
-      //   this.isEditing = false;
-      //   this.customerForm.disable();
-
-      //   this.snackBar.open('Customer profile updated successfully!', 'Close', {
-      //     duration: 3000,
-      //     panelClass: ['success-snackbar'],
-      //   });
-      // }, 1500);
     } else {
       this.markFormGroupTouched();
       this.snackBar.open('Please correct the errors in the form', 'Close', {
@@ -318,27 +294,6 @@ export class CustomerUpdateComponent implements OnInit {
 
     if (confirmDeactivation) {
       this.isLoading = true;
-
-      // Call the actual API when ready
-      // this.customerService.deactivateCustomer(this.currentCustomer.customerId).subscribe({
-      //   next: (response) => {
-      //     this.currentCustomer!.status = 'INACTIVE';
-      //     this.customerForm.patchValue({ status: 'INACTIVE' });
-      //     this.isLoading = false;
-      //
-      //     this.snackBar.open('Customer has been deactivated', 'Close', {
-      //       duration: 3000,
-      //       panelClass: ['warning-snackbar'],
-      //     });
-      //   },
-      //   error: (error) => {
-      //     this.isLoading = false;
-      //     this.snackBar.open('Failed to deactivate customer', 'Close', {
-      //       duration: 3000,
-      //       panelClass: ['error-snackbar'],
-      //     });
-      //   }
-      // });
 
       // Simulate API call
       setTimeout(() => {

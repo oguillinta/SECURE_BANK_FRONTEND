@@ -328,19 +328,6 @@ export class AccountFreezeComponent {
             });
           },
         });
-
-      // Simulate API call for now
-      // setTimeout(() => {
-      //   this.selectedAccount!.status = 'FROZEN';
-      //   this.isLoading = false;
-
-      //   this.snackBar.open('Account has been successfully frozen', 'Close', {
-      //     duration: 5000,
-      //     panelClass: ['success-snackbar'],
-      //   });
-
-      //   this.logFreezeAction(freezeRequest);
-      // }, 2000);
     } else {
       this.markFormGroupTouched(this.freezeForm);
       this.markFormGroupTouched(this.confirmationForm);
@@ -419,7 +406,6 @@ export class AccountFreezeComponent {
       'Generate freeze report for account:',
       this.selectedAccount?.accountNumber
     );
-    // Implement freeze report generation
   }
 
   private logFreezeAction(request: FreezeAccountRequest) {
@@ -518,8 +504,6 @@ export class AccountFreezeComponent {
   }
 
   getCustomerName(): string {
-    // Since the account object doesn't have customer name,
-    // you might need to fetch it separately or use a default
     return this.selectedAccount?.customerId || 'Customer';
   }
 
