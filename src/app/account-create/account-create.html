@@ -1,0 +1,609 @@
+<div class="account-create-container">
+  <!-- Header Section -->
+  <div class="create-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">Create New Account</h1>
+        <p class="page-subtitle">
+          Set up a new bank account for an existing customer
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button mat-button (click)="onCancel()" class="action-btn">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Customers
+        </button>
+
+        <button mat-button (click)="onReset()" class="action-btn">
+          <mat-icon>refresh</mat-icon>
+          Reset Form
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="stats-cards">
+      <div class="stat-card" [ngClass]="getStepClass(1)">
+        <div class="stat-icon">
+          <mat-icon>{{ getStepIcon(1) }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Step 1 of 3</div>
+          <div class="stat-value">Customer Selection</div>
+        </div>
+      </div>
+
+      <div class="stat-card" [ngClass]="getStepClass(2)">
+        <div class="stat-icon">
+          <mat-icon>{{ getStepIcon(2) }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Step 2 of 3</div>
+          <div class="stat-value">Account Configuration</div>
+        </div>
+      </div>
+
+      <div class="stat-card" [ngClass]="getStepClass(3)">
+        <div class="stat-icon">
+          <mat-icon>{{ getStepIcon(3) }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Step 3 of 3</div>
+          <div class="stat-value">Confirmation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Customer Selection -->
+  <div *ngIf="currentStep === 1">
+    <!-- Search and Filter Section -->
+    <mat-card class="search-section">
+      <mat-card-content>
+        <form [formGroup]="customerForm" class="search-form">
+          <div class="search-row">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search Customer</mat-label>
+              <input
+                matInput
+                formControlName="customerSearch"
+                placeholder="Search by name, email, or customer ID"
+                (input)="onCustomerSearch()"
+              />
+              <mat-icon matSuffix>search</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('customerSearch')?.invalid &&
+                  customerForm.get('customerSearch')?.touched
+                "
+              >
+                {{ getErrorMessage(customerForm, "customerSearch") }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Customer Type</mat-label>
+              <mat-select formControlName="customerType" (selectionChange)="onCustomerSearch()">
+                <mat-option value="">All Types</mat-option>
+                <mat-option value="BUSINESS">Business</mat-option>
+                <mat-option value="PERSONAL">Personal</mat-option>
+                <mat-option value="VIP">VIP</mat-option>
+                <mat-option value="CORPORATE">Corporate</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" (selectionChange)="onCustomerSearch()">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option value="ACTIVE">Active</mat-option>
+                <mat-option value="INACTIVE">Inactive</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Sort By</mat-label>
+              <mat-select formControlName="sortBy" (selectionChange)="onCustomerSearch()">
+                <mat-option value="lastName">Last Name</mat-option>
+                <mat-option value="firstName">First Name</mat-option>
+                <mat-option value="customerType">Customer Type</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="filter-field">
+              <mat-label>Order</mat-label>
+              <mat-select formControlName="sortOrder" (selectionChange)="onCustomerSearch()">
+                <mat-option value="asc">Ascending</mat-option>
+                <mat-option value="desc">Descending</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button
+              mat-button
+              type="button"
+              (click)="onResetFilters()"
+              class="clear-btn"
+            >
+              <mat-icon>clear</mat-icon>
+              Clear
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Customer List Table -->
+    <mat-card class="table-section">
+      <mat-card-content class="table-content">
+        <!-- Results Info -->
+        <div class="results-info">
+          <span class="results-count"
+            >{{ filteredCustomers.length }} customers found</span
+          >
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table
+            mat-table
+            [dataSource]="filteredCustomers"
+            class="customer-table"
+          >
+            <!-- Customer Column -->
+            <ng-container matColumnDef="customer">
+              <th mat-header-cell *matHeaderCellDef>Customer</th>
+              <td mat-cell *matCellDef="let customer">
+                <div class="customer-info">
+                  <div class="customer-avatar" [ngClass]="{'selected': selectedCustomer?.customerId === customer.customerId}">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <div class="customer-details">
+                    <div class="customer-name">
+                      {{ customer.firstName }} {{ customer.lastName }}
+                    </div>
+                    <div class="customer-id">{{ customer.customerId }}</div>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Contact Column -->
+            <ng-container matColumnDef="contact">
+              <th mat-header-cell *matHeaderCellDef>Contact</th>
+              <td mat-cell *matCellDef="let customer">
+                <div class="contact-info">
+                  <div class="contact-email">{{ customer.email }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Type Column -->
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let customer">
+                <mat-chip
+                  [ngClass]="getCustomerTypeChipClass(customer.customerType)"
+                >
+                  {{ customer.customerType }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let customer">
+                <mat-chip [ngClass]="getStatusChipClass(customer.status)">
+                  <mat-icon *ngIf="customer.status === 'ACTIVE'"
+                    >check_circle</mat-icon
+                  >
+                  <mat-icon *ngIf="customer.status === 'INACTIVE'"
+                    >cancel</mat-icon
+                  >
+                  {{ customer.status }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let customer">
+                <div class="action-buttons">
+                  <button
+                    mat-icon-button
+                    (click)="onCustomerSelect(customer); $event.stopPropagation()"
+                    matTooltip="Select Customer"
+                    class="edit-btn"
+                  >
+                    <mat-icon>{{ selectedCustomer?.customerId === customer.customerId ? 'check_circle' : 'add_circle' }}</mat-icon>
+                  </button>
+
+                  <button
+                    mat-icon-button
+                    matTooltip="More Actions"
+                    class="menu-btn"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let customer; columns: displayedColumns"
+              class="customer-row"
+              [ngClass]="{'selected-row': selectedCustomer?.customerId === customer.customerId}"
+              (click)="onCustomerSelect(customer)"
+            ></tr>
+          </table>
+        </div>
+
+        <!-- Selected Customer Section -->
+        <div class="selected-customer-section" *ngIf="selectedCustomer">
+          <div class="section-header">
+            <h3>Selected Customer</h3>
+          </div>
+
+          <div class="selected-customer-card">
+            <div class="customer-info-row">
+              <div class="customer-avatar selected">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="customer-details">
+                <div class="customer-name">
+                  {{ selectedCustomer.firstName }} {{ selectedCustomer.lastName }}
+                </div>
+                <div class="customer-meta">
+                  <span class="customer-id">{{
+                    selectedCustomer.customerId
+                  }}</span>
+                  <span class="customer-email">{{ selectedCustomer.email }}</span>
+                </div>
+                <mat-chip
+                  [ngClass]="
+                    getCustomerTypeChipClass(selectedCustomer.customerType)
+                  "
+                >
+                  {{ selectedCustomer.customerType }}
+                </mat-chip>
+              </div>
+              <button
+                mat-icon-button
+                (click)="onDeselectCustomer()"
+                class="change-button"
+                matTooltip="Change customer"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="filteredCustomers.length === 0">
+          <mat-icon class="no-results-icon">search_off</mat-icon>
+          <h3>No customers found</h3>
+          <p>Try adjusting your search criteria or check if customers exist.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Section -->
+    <div class="action-section" *ngIf="selectedCustomer">
+      <button
+        mat-raised-button
+        (click)="onNextStep()"
+        [disabled]="!selectedCustomer"
+        class="next-button"
+      >
+        Next: Account Details
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Account Configuration -->
+  <div *ngIf="currentStep === 2">
+    <!-- Customer Summary Section -->
+    <mat-card class="customer-summary-section">
+      <mat-card-content>
+        <div class="summary-header">
+          <h3>Selected Customer</h3>
+          <button
+            mat-button
+            (click)="goBackToCustomerSelection()"
+            class="change-customer-btn"
+          >
+            <mat-icon>edit</mat-icon>
+            Change Customer
+          </button>
+        </div>
+
+        <div class="customer-summary-card" *ngIf="selectedCustomer">
+          <div class="customer-info-row">
+            <div class="customer-avatar selected">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="customer-details">
+              <div class="customer-name">
+                {{ selectedCustomer.firstName }} {{ selectedCustomer.lastName }}
+              </div>
+              <div class="customer-meta">
+                <span class="customer-id">{{ selectedCustomer.customerId }}</span>
+                <span class="customer-email">{{ selectedCustomer.email }}</span>
+                <mat-chip [ngClass]="getCustomerTypeChipClass(selectedCustomer.customerType)">
+                  {{ selectedCustomer.customerType }}
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Configuration Section -->
+    <mat-card class="config-section">
+      <mat-card-content>
+        <form [formGroup]="accountForm" class="account-form">
+          <div class="form-header">
+            <div class="form-icon">
+              <mat-icon>account_balance</mat-icon>
+            </div>
+            <div>
+              <h3>Account Configuration</h3>
+              <p>Configure the new account settings and features</p>
+            </div>
+          </div>
+
+          <div class="form-sections">
+            <!-- Account Type Selection -->
+            <div class="form-section">
+              <h4>Account Type</h4>
+              <div class="account-types-grid">
+                <div
+                  *ngFor="let type of accountTypes"
+                  class="account-type-card"
+                  [ngClass]="{'selected': accountForm.get('accountType')?.value === type.value}"
+                  (click)="selectAccountType(type.value)"
+                >
+                  <div class="type-icon">
+                    <mat-icon>{{ type.icon }}</mat-icon>
+                  </div>
+                  <div class="type-info">
+                    <div class="type-name">{{ type.label }}</div>
+                    <div class="type-description">{{ type.description }}</div>
+                    <div class="type-details">
+                      <small>Min. Balance: {{ formatCurrency(type.minBalance) }}</small>
+                      <small>Default Limit: {{ formatCurrency(type.defaultLimit) }}</small>
+                    </div>
+                  </div>
+                  <mat-icon class="selection-indicator" *ngIf="accountForm.get('accountType')?.value === type.value">
+                    check_circle
+                  </mat-icon>
+                </div>
+              </div>
+              <mat-error *ngIf="accountForm.get('accountType')?.invalid && accountForm.get('accountType')?.touched">
+                {{ getErrorMessage(accountForm, 'accountType') }}
+              </mat-error>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="form-section">
+              <h4>Account Settings</h4>
+              <div class="settings-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Initial Balance</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="initialBalance"
+                    placeholder="0.00"
+                  />
+                  <span matPrefix>$&nbsp;</span>
+                  <mat-error *ngIf="accountForm.get('initialBalance')?.invalid && accountForm.get('initialBalance')?.touched">
+                    {{ getErrorMessage(accountForm, 'initialBalance') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Daily Transaction Limit</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="dailyTransactionLimit"
+                    placeholder="5000.00"
+                  />
+                  <span matPrefix>$&nbsp;</span>
+                  <mat-error *ngIf="accountForm.get('dailyTransactionLimit')?.invalid && accountForm.get('dailyTransactionLimit')?.touched">
+                    {{ getErrorMessage(accountForm, 'dailyTransactionLimit') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Account Status</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option value="ACTIVE">Active</mat-option>
+                    <mat-option value="INACTIVE">Inactive</mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="accountForm.get('status')?.invalid && accountForm.get('status')?.touched">
+                    {{ getErrorMessage(accountForm, 'status') }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+
+
+            <!-- Agreement -->
+            <div class="form-section agreement-section">
+              <h4>Terms and Conditions</h4>
+              <div class="agreement-content">
+                <mat-checkbox formControlName="agreementAccepted" required>
+                  <div class="checkbox-content required">
+                    <strong>I confirm that the customer has agreed to the terms and conditions</strong>
+                    <span>This account will be created under the bank's standard terms of service</span>
+                  </div>
+                </mat-checkbox>
+                <mat-error *ngIf="accountForm.get('agreementAccepted')?.invalid && accountForm.get('agreementAccepted')?.touched">
+                  {{ getErrorMessage(accountForm, 'agreementAccepted') }}
+                </mat-error>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Navigation -->
+    <div class="navigation-section">
+      <div class="nav-actions">
+        <button
+          mat-button
+          (click)="goBackToCustomerSelection()"
+          class="back-btn"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          Back to Customer Selection
+        </button>
+
+        <button
+          mat-raised-button
+          (click)="proceedToConfirmation()"
+          [disabled]="accountForm.invalid"
+          class="next-button"
+        >
+          Review & Confirm
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Confirmation -->
+  <div *ngIf="currentStep === 3">
+    <!-- Customer Summary -->
+    <mat-card class="customer-summary-section">
+      <mat-card-content>
+        <div class="summary-header">
+          <h3>Account Creation Summary</h3>
+          <button
+            mat-button
+            (click)="currentStep = 2"
+            class="change-customer-btn"
+          >
+            <mat-icon>edit</mat-icon>
+            Edit Configuration
+          </button>
+        </div>
+
+        <div class="customer-summary-card" *ngIf="selectedCustomer">
+          <div class="customer-info-row">
+            <div class="customer-avatar selected">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="customer-details">
+              <div class="customer-name">
+                {{ selectedCustomer.firstName }} {{ selectedCustomer.lastName }}
+              </div>
+              <div class="customer-meta">
+                <span class="customer-id">{{ selectedCustomer.customerId }}</span>
+                <span class="customer-email">{{ selectedCustomer.email }}</span>
+                <mat-chip [ngClass]="getCustomerTypeChipClass(selectedCustomer.customerType)">
+                  {{ selectedCustomer.customerType }}
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Account Details Summary -->
+    <mat-card class="config-section">
+      <mat-card-content>
+        <div class="form-header">
+          <div class="form-icon">
+            <mat-icon>{{ getSelectedAccountType()?.icon || 'account_balance' }}</mat-icon>
+          </div>
+          <div>
+            <h3>{{ getSelectedAccountType()?.label || 'Account' }} Details</h3>
+            <p>Review the account configuration before creation</p>
+          </div>
+        </div>
+
+        <div class="form-sections">
+          <!-- Account Overview -->
+          <div class="form-section">
+            <h4>Account Overview</h4>
+            <div class="overview-grid">
+              <div class="overview-item">
+                <div class="overview-label">Account Type:</div>
+                <div class="overview-value">{{ getSelectedAccountType()?.label }}</div>
+              </div>
+              <div class="overview-item">
+                <div class="overview-label">Initial Balance:</div>
+                <div class="overview-value">{{ formatCurrency(accountForm.get('initialBalance')?.value || 0) }}</div>
+              </div>
+              <div class="overview-item">
+                <div class="overview-label">Daily Limit:</div>
+                <div class="overview-value">{{ formatCurrency(accountForm.get('dailyTransactionLimit')?.value || 0) }}</div>
+              </div>
+              <div class="overview-item">
+                <div class="overview-label">Status:</div>
+                <div class="overview-value">
+                  <mat-chip [ngClass]="getStatusChipClass(accountForm.get('status')?.value)">
+                    {{ accountForm.get('status')?.value }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Settings -->
+          <div class="form-section">
+            <h4>Additional Settings</h4>
+            <div class="overview-grid">
+              <div class="overview-item">
+                <div class="overview-label">Notify Customer:</div>
+                <div class="overview-value">
+                  <span class="notify-badge {{ accountForm.get('notifyCustomer')?.value ? 'notify-yes' : 'notify-no' }}">
+                    {{ accountForm.get('notifyCustomer')?.value ? 'Yes' : 'No' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Final Actions -->
+    <div class="navigation-section">
+      <div class="nav-actions">
+        <button
+          mat-button
+          (click)="currentStep = 2"
+          class="back-btn"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          Back to Configuration
+        </button>
+
+        <button
+          mat-raised-button
+          (click)="onCreateAccount()"
+          [disabled]="isLoading || accountForm.invalid"
+          class="next-button create-btn"
+        >
+          <mat-icon *ngIf="isLoading">hourglass_empty</mat-icon>
+          <mat-icon *ngIf="!isLoading">check</mat-icon>
+          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

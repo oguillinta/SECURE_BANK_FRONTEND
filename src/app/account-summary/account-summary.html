@@ -1,0 +1,353 @@
+<div class="accounts-summary-container">
+  <!-- Header Section -->
+  <div class="summary-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">Accounts Summary Report</h1>
+        <p class="page-subtitle">
+          Comprehensive overview of all account types and balances
+        </p>
+        <div class="last-updated" *ngIf="lastUpdated">
+          <mat-icon>update</mat-icon>
+          Last updated: {{ formatDate(lastUpdated) }}
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button
+          mat-button
+          class="action-btn"
+          (click)="onRefreshData()"
+          [disabled]="isLoading"
+          matTooltip="Refresh data"
+        >
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
+
+        <button
+          mat-button
+          class="action-btn"
+          (click)="onExportReport()"
+          matTooltip="Export report"
+        >
+          <mat-icon>download</mat-icon>
+          Export
+        </button>
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onGenerateDetailedReport()"
+          class="detailed-report-btn"
+        >
+          <mat-icon>assessment</mat-icon>
+          Detailed Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-section" *ngIf="isLoading">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-icon class="loading-spinner">donut_large</mat-icon>
+          <h3>Loading Accounts Summary...</h3>
+          <p>Please wait while we compile the latest account data.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading">
+    <!-- Overview Cards -->
+    <div class="overview-cards">
+      <mat-card class="overview-card total-accounts">
+        <div class="card-icon">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">Total Accounts</div>
+          <div class="card-value">{{ formatNumber(totalAccounts) }}</div>
+          <div class="card-detail">
+            {{ getTotalActiveAccounts() }} Active •
+            {{ getTotalFrozenAccounts() }} Frozen •
+            {{ getTotalClosedAccounts() }} Closed
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="overview-card total-balance">
+        <div class="card-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">Total Balance</div>
+          <div class="card-value">{{ formatCurrency(totalBalance) }}</div>
+          <div class="card-detail">
+            Average: {{ formatCurrency(getOverallAverageBalance()) }}
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="overview-card account-health">
+        <div class="card-icon">
+          <mat-icon>health_and_safety</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-label">Account Health</div>
+          <div class="card-value" [ngClass]="getHealthStatusClass()">
+            {{ getHealthStatus() }}
+          </div>
+          <div class="card-detail">
+            {{ formatPercentage(getHealthPercentage()) }} Active Accounts
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Account Types Summary -->
+    <div class="account-types-section">
+      <mat-card class="section-card">
+        <mat-card-header class="section-header">
+          <mat-icon mat-card-avatar class="section-icon">category</mat-icon>
+          <mat-card-title>Account Types Breakdown</mat-card-title>
+          <mat-card-subtitle
+            >Detailed summary by account type</mat-card-subtitle
+          >
+        </mat-card-header>
+
+        <mat-card-content class="section-content">
+          <div class="account-types-grid">
+            <div
+              *ngFor="let accountType of summaryData"
+              class="account-type-card"
+              (click)="onViewAccountDetails(accountType.accountType)"
+            >
+              <!-- Account Type Header -->
+              <div class="account-type-header">
+                <div
+                  class="type-icon"
+                  [style.background-color]="
+                    getAccountTypeColor(accountType.accountType)
+                  "
+                >
+                  <mat-icon>{{
+                    getAccountTypeIcon(accountType.accountType)
+                  }}</mat-icon>
+                </div>
+                <div class="type-info">
+                  <h3 class="type-name">
+                    {{ getAccountTypeLabel(accountType.accountType) }}
+                  </h3>
+                  <div class="type-count">
+                    {{ accountType.totalAccounts }} accounts
+                  </div>
+                </div>
+                <button
+                  mat-icon-button
+                  class="view-details-btn"
+                  matTooltip="View details"
+                  (click)="
+                    onViewAccountDetails(accountType.accountType);
+                    $event.stopPropagation()
+                  "
+                >
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+              </div>
+
+              <!-- Balance Information -->
+              <div class="balance-info">
+                <div class="balance-item">
+                  <span class="balance-label">Total Balance</span>
+                  <span class="balance-value primary">{{
+                    formatCurrency(accountType.totalBalance)
+                  }}</span>
+                </div>
+                <div class="balance-item">
+                  <span class="balance-label">Average Balance</span>
+                  <span class="balance-value">{{
+                    formatCurrency(accountType.averageBalance)
+                  }}</span>
+                </div>
+              </div>
+
+              <!-- Account Status Breakdown -->
+              <div class="status-breakdown">
+                <div class="status-header">
+                  <span class="status-title">Account Status</span>
+                  <span class="active-percentage">
+                    {{
+                      formatPercentage(
+                        getStatusPercentage(
+                          accountType.activeAccountsCount,
+                          accountType.totalAccounts
+                        )
+                      )
+                    }}
+                    Active
+                  </span>
+                </div>
+
+                <div class="status-progress">
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="
+                      getStatusPercentage(
+                        accountType.activeAccountsCount,
+                        accountType.totalAccounts
+                      )
+                    "
+                    class="account-health-bar"
+                  ></mat-progress-bar>
+                </div>
+
+                <div class="status-counts">
+                  <div class="status-count active">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ accountType.activeAccountsCount }} Active</span>
+                  </div>
+                  <div
+                    class="status-count frozen"
+                    *ngIf="accountType.frozenAccountsCount > 0"
+                  >
+                    <mat-icon>ac_unit</mat-icon>
+                    <span>{{ accountType.frozenAccountsCount }} Frozen</span>
+                  </div>
+                  <div
+                    class="status-count closed"
+                    *ngIf="accountType.closedAccountsCount > 0"
+                  >
+                    <mat-icon>block</mat-icon>
+                    <span>{{ accountType.closedAccountsCount }} Closed</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Balance Distribution -->
+              <div class="balance-distribution">
+                <div class="distribution-header">
+                  <span class="distribution-title">Balance Distribution</span>
+                  <span class="distribution-percentage">
+                    {{
+                      formatPercentage(
+                        (accountType.totalBalance / totalBalance) * 100
+                      )
+                    }}
+                    of Total
+                  </span>
+                </div>
+                <div class="distribution-bar">
+                  <div
+                    class="distribution-fill"
+                    [style.width.%]="
+                      (accountType.totalBalance / totalBalance) * 100
+                    "
+                    [style.background-color]="
+                      getAccountTypeColor(accountType.accountType)
+                    "
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="statistics-section">
+      <mat-card class="section-card">
+        <mat-card-header class="section-header">
+          <mat-icon mat-card-avatar class="section-icon">analytics</mat-icon>
+          <mat-card-title>Key Statistics</mat-card-title>
+          <mat-card-subtitle>Important metrics and trends</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="section-content">
+          <div class="statistics-grid">
+            <!-- Account Distribution -->
+            <div class="stat-item">
+              <h4 class="stat-title">
+                <mat-icon>pie_chart</mat-icon>
+                Account Distribution
+              </h4>
+              <div class="chart-container">
+                <div class="chart-legend">
+                  <div *ngFor="let data of chartData" class="legend-item">
+                    <div
+                      class="legend-color"
+                      [style.background-color]="data.color"
+                    ></div>
+                    <span class="legend-label">{{ data.name }}</span>
+                    <span class="legend-value">{{ data.value }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Balance Distribution -->
+            <div class="stat-item">
+              <h4 class="stat-title">
+                <mat-icon>account_balance</mat-icon>
+                Balance Distribution
+              </h4>
+              <div class="balance-chart">
+                <div *ngFor="let data of balanceChartData" class="balance-bar">
+                  <div class="balance-bar-info">
+                    <span class="balance-bar-label">{{ data.name }}</span>
+                    <span class="balance-bar-value">{{
+                      formatCurrency(data.value)
+                    }}</span>
+                  </div>
+                  <div class="balance-bar-container">
+                    <div
+                      class="balance-bar-fill"
+                      [style.width.%]="data.percentage"
+                      [style.background-color]="data.color"
+                    ></div>
+                  </div>
+                  <span class="balance-bar-percentage">{{
+                    formatPercentage(data.percentage)
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Health Metrics -->
+            <div class="stat-item">
+              <h4 class="stat-title">
+                <mat-icon>monitoring</mat-icon>
+                Health Metrics
+              </h4>
+              <div class="health-metrics">
+                <div class="health-metric">
+                  <div class="health-metric-value active">
+                    {{ getTotalActiveAccounts() }}
+                  </div>
+                  <div class="health-metric-label">Active Accounts</div>
+                </div>
+                <div class="health-metric">
+                  <div class="health-metric-value frozen">
+                    {{ getTotalFrozenAccounts() }}
+                  </div>
+                  <div class="health-metric-label">Frozen Accounts</div>
+                </div>
+                <div class="health-metric">
+                  <div class="health-metric-value closed">
+                    {{ getTotalClosedAccounts() }}
+                  </div>
+                  <div class="health-metric-label">Closed Accounts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

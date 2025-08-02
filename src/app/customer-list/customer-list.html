@@ -1,0 +1,306 @@
+<div class="customer-management-container">
+  <!-- Header Section -->
+  <div class="management-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">Customer Management</h1>
+        <p class="page-subtitle">Manage customer accounts and information</p>
+      </div>
+
+      <div class="header-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          class="new-customer-btn"
+          (click)="onCreateNewCustomer()"
+        >
+          <mat-icon>person_add</mat-icon>
+          New Customer
+        </button>
+
+        <button
+          mat-button
+          class="export-btn"
+          (click)="onExportCustomers()"
+        >
+          <mat-icon>download</mat-icon>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Customers</div>
+          <div class="summary-value">{{ totalCustomers }}</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon active">
+          <mat-icon>verified</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Active Customers</div>
+          <div class="summary-value">{{ activeCustomers }}</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon new">
+          <mat-icon>new_releases</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">New This Month</div>
+          <div class="summary-value">{{ newThisMonth }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <mat-card class="search-section">
+    <mat-card-content>
+      <form [formGroup]="searchForm" class="search-form">
+        <div class="search-row">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search Customers</mat-label>
+            <input
+              matInput
+              formControlName="searchText"
+              placeholder="Search by name, email, or customer ID"
+              (input)="onSearch()"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Customer Type</mat-label>
+            <mat-select formControlName="customerType" (selectionChange)="onSearch()">
+              <mat-option value="">All Types</mat-option>
+              <mat-option value="INDIVIDUAL">Individual</mat-option>
+              <mat-option value="BUSINESS">Business</mat-option>
+              <mat-option value="CORPORATE">Corporate</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" (selectionChange)="onSearch()">
+              <mat-option value="">All Statuses</mat-option>
+              <mat-option value="ACTIVE">Active</mat-option>
+              <mat-option value="INACTIVE">Inactive</mat-option>
+              <mat-option value="SUSPENDED">Suspended</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Sort By</mat-label>
+            <mat-select formControlName="sortBy" (selectionChange)="onSearch()">
+              <mat-option value="lastName">Last Name</mat-option>
+              <mat-option value="firstName">First Name</mat-option>
+              <mat-option value="customerType">Customer Type</mat-option>
+              <mat-option value="createdAt">Date Created</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Order</mat-label>
+            <mat-select formControlName="sortOrder" (selectionChange)="onSearch()">
+              <mat-option value="asc">Ascending</mat-option>
+              <mat-option value="desc">Descending</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button
+            mat-button
+            type="button"
+            (click)="onClearFilters()"
+            class="clear-btn"
+          >
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Customer List Table -->
+  <mat-card class="table-section">
+    <mat-card-content class="table-content">
+      <!-- Results Info -->
+      <div class="results-info">
+        <span class="results-count">{{ filteredCustomers.length }} customers found</span>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container" *ngIf="filteredCustomers.length > 0">
+        <table mat-table [dataSource]="filteredCustomers" class="customer-table">
+          <!-- Customer Column -->
+          <ng-container matColumnDef="customer">
+            <th mat-header-cell *matHeaderCellDef>Customer</th>
+            <td mat-cell *matCellDef="let customer">
+              <div class="customer-info">
+                <div class="customer-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="customer-details">
+                  <div class="customer-name">
+                    {{ customer.firstName }} {{ customer.lastName }}
+                  </div>
+                  <div class="customer-id">{{ customer.customerId }}</div>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Contact Column -->
+          <ng-container matColumnDef="contact">
+            <th mat-header-cell *matHeaderCellDef>Contact</th>
+            <td mat-cell *matCellDef="let customer">
+              <div class="contact-info">
+                <div class="contact-email">{{ customer.email }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let customer">
+              <mat-chip [ngClass]="getCustomerTypeChipClass(customer.customerType)">
+                {{ customer.customerType }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let customer">
+              <mat-chip [ngClass]="getStatusChipClass(customer.status)">
+                <mat-icon *ngIf="customer.status === 'ACTIVE'">check_circle</mat-icon>
+                <mat-icon *ngIf="customer.status !== 'ACTIVE'">cancel</mat-icon>
+                {{ customer.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Total Balance Column - Remove this entire section -->
+
+          <!-- Accounts Column - Remove this entire section -->
+
+          <!-- Last Activity Column -->
+          <ng-container matColumnDef="lastActivity">
+            <th mat-header-cell *matHeaderCellDef>Last Activity</th>
+            <td mat-cell *matCellDef="let customer">
+              <div class="last-activity">
+                {{ formatDate(customer.updatedAt) }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let customer">
+              <div class="action-buttons">
+                <button
+                  mat-icon-button
+                  (click)="onViewCustomer(customer); $event.stopPropagation()"
+                  matTooltip="View Details"
+                  class="view-btn"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  (click)="onEditCustomer(customer); $event.stopPropagation()"
+                  matTooltip="Edit Customer"
+                  class="edit-btn"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  [matMenuTriggerFor]="customerMenu"
+                  matTooltip="More Actions"
+                  class="menu-btn"
+                  (click)="$event.stopPropagation()"
+                >
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+
+                <mat-menu #customerMenu="matMenu">
+                  <button mat-menu-item (click)="onViewAccounts(customer)">
+                    <mat-icon>account_balance</mat-icon>
+                    <span>View Accounts</span>
+                  </button>
+                  <button mat-menu-item (click)="onCreateAccount(customer)">
+                    <mat-icon>add_circle</mat-icon>
+                    <span>Create Account</span>
+                  </button>
+                  <button mat-menu-item (click)="onViewTransactions(customer)">
+                    <mat-icon>receipt_long</mat-icon>
+                    <span>Transaction History</span>
+                  </button>
+                  <mat-divider></mat-divider>
+                  <button 
+                    mat-menu-item 
+                    (click)="onSuspendCustomer(customer)"
+                    class="suspend-option"
+                    *ngIf="customer.status === 'ACTIVE'"
+                  >
+                    <mat-icon>pause_circle</mat-icon>
+                    <span>Suspend Customer</span>
+                  </button>
+                  <button 
+                    mat-menu-item 
+                    (click)="onActivateCustomer(customer)"
+                    class="activate-option"
+                    *ngIf="customer.status !== 'ACTIVE'"
+                  >
+                    <mat-icon>play_circle</mat-icon>
+                    <span>Activate Customer</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let customer; columns: displayedColumns"
+            class="customer-row"
+            (click)="onViewCustomer(customer)"
+          ></tr>
+        </table>
+      </div>
+
+      <!-- No Results -->
+      <div class="no-results" *ngIf="filteredCustomers.length === 0">
+        <mat-icon class="no-results-icon">search_off</mat-icon>
+        <h3>No customers found</h3>
+        <p>Try adjusting your search criteria or create a new customer.</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onCreateNewCustomer()"
+          class="create-customer-btn"
+        >
+          <mat-icon>person_add</mat-icon>
+          Create New Customer
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

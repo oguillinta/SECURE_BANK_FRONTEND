@@ -1,0 +1,107 @@
+<div class="banking-layout">
+  <!-- Top Navigation Bar -->
+  <mat-toolbar class="topbar">
+    <div class="topbar-left">
+      <button mat-icon-button (click)="toggleSidenav()" class="menu-toggle">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <div class="bank-logo">
+        <span class="bank-icon-text">🏦</span>
+        <span class="bank-name">Secure Bank</span>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <span class="welcome-text"
+        >Welcome back, {{ userProfile?.firstName }}</span
+      >
+    </div>
+
+    <div class="topbar-right">
+      <button
+        mat-icon-button
+        (click)="onNotificationClick()"
+        class="notification-btn"
+      >
+        <mat-icon [matBadge]="userNotifications" matBadgeColor="accent"
+          >notifications</mat-icon
+        >
+      </button>
+
+      <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
+        <mat-icon>account_circle</mat-icon>
+        <span class="profile-name">{{ userProfile?.username }}</span>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+
+      <mat-menu #profileMenu="matMenu" class="profile-menu">
+        <div class="profile-info">
+          <mat-icon>account_circle</mat-icon>
+          <div class="user-details">
+            <div class="user-name">{{ userProfile?.username }}</div>
+            <div class="user-email">{{ userProfile?.email }}</div>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item>
+          <mat-icon>person</mat-icon>
+          <span>Profile Settings</span>
+        </button>
+        <button mat-menu-item>
+          <mat-icon>security</mat-icon>
+          <span>Security</span>
+        </button>
+        <button mat-menu-item (click)="onLogout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Sidebar Navigation -->
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav
+        #sidenav
+        [opened]="isSidenavOpen"
+        mode="side"
+        class="sidebar"
+      >
+        <div class="sidebar-content">
+          <mat-nav-list class="nav-list">
+            <mat-list-item
+              *ngFor="let item of menuItems"
+              class="nav-item"
+              (click)="onMenuItemClick(item)"
+            >
+              <mat-icon matListItemIcon class="nav-icon">{{
+                item.icon
+              }}</mat-icon>
+              <span matListItemTitle class="nav-label">{{ item.label }}</span>
+            </mat-list-item>
+          </mat-nav-list>
+
+          <!-- Sidebar Footer -->
+          <div class="sidebar-footer">
+            <div class="account-summary">
+              <div class="account-info">
+                <div class="account-label">Total Balance</div>
+                <div class="account-balance">$24,580.50</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-sidenav>
+
+      <!-- Main Content Area -->
+      <mat-sidenav-content class="main-content">
+        <div class="content-wrapper">
+          <!-- Router Outlet for Child Components -->
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+</div>

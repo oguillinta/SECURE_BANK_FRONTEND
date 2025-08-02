@@ -1,0 +1,383 @@
+<div class="customer-update-container">
+  <!-- Loading Customer Data -->
+  <div class="loading-customer" *ngIf="isLoadingCustomer">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-icon class="loading-spinner">person</mat-icon>
+          <h3>Loading Customer Details...</h3>
+          <p>Please wait while we fetch the customer information.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Content - Only show when customer is loaded -->
+  <div *ngIf="isCustomerLoaded()">
+    <!-- Header Section -->
+    <div class="update-header">
+      <div class="header-content">
+        <div class="customer-info">
+          <div class="customer-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="customer-details">
+            <h1 class="customer-name">
+              {{ currentCustomer!.firstName }} {{ currentCustomer!.lastName }}
+            </h1>
+            <p class="customer-id">
+              Customer ID: {{ currentCustomer!.customerId }}
+            </p>
+            <div class="customer-status">
+              <mat-chip [ngClass]="getStatusChipClass()">
+                <mat-icon *ngIf="currentCustomer!.status === 'ACTIVE'"
+                  >check_circle</mat-icon
+                >
+                <mat-icon *ngIf="currentCustomer!.status === 'INACTIVE'"
+                  >cancel</mat-icon
+                >
+                <mat-icon *ngIf="currentCustomer!.status === 'SUSPENDED'"
+                  >warning</mat-icon
+                >
+                {{ currentCustomer!.status }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="toggleEdit()"
+            [disabled]="isLoading"
+            class="edit-btn"
+          >
+            <mat-icon>{{ isEditing ? "close" : "edit" }}</mat-icon>
+            {{ isEditing ? "Cancel Edit" : "Update Profile" }}
+          </button>
+
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onViewAccounts()"
+            matTooltip="View customer accounts"
+          >
+            <mat-icon>account_balance_wallet</mat-icon>
+            Accounts
+          </button>
+
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onViewTransactions()"
+            matTooltip="View transaction history"
+          >
+            <mat-icon>history</mat-icon>
+            Transactions
+          </button>
+
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onGenerateReport()"
+            matTooltip="Generate customer report"
+          >
+            <mat-icon>assessment</mat-icon>
+            Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-label">Member Since</span>
+          <span class="stat-value">{{ currentCustomer!.createdAt }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Last Updated</span>
+          <span class="stat-value">{{ currentCustomer!.updatedAt }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Customer Type</span>
+          <span class="stat-value">{{ currentCustomer!.customerType }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Form -->
+    <form
+      [formGroup]="customerForm"
+      (ngSubmit)="onSubmit()"
+      class="update-form"
+    >
+      <!-- Personal Information Card -->
+      <mat-card class="form-section">
+        <mat-card-header class="section-header">
+          <mat-icon mat-card-avatar class="section-icon">person</mat-icon>
+          <mat-card-title class="section-title"
+            >Personal Information</mat-card-title
+          >
+          <mat-card-subtitle
+            >Customer's personal details and contact
+            information</mat-card-subtitle
+          >
+        </mat-card-header>
+
+        <mat-card-content class="section-content">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Customer ID</mat-label>
+              <input matInput formControlName="customerId" readonly />
+              <mat-icon matSuffix>badge</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>First Name</mat-label>
+              <input
+                matInput
+                formControlName="firstName"
+                [readonly]="!isEditing"
+              />
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('firstName')?.invalid &&
+                  customerForm.get('firstName')?.touched
+                "
+              >
+                {{ getErrorMessage("firstName") }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Last Name</mat-label>
+              <input
+                matInput
+                formControlName="lastName"
+                [readonly]="!isEditing"
+              />
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('lastName')?.invalid &&
+                  customerForm.get('lastName')?.touched
+                "
+              >
+                {{ getErrorMessage("lastName") }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Email Address</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                [readonly]="!isEditing"
+              />
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('email')?.invalid &&
+                  customerForm.get('email')?.touched
+                "
+              >
+                {{ getErrorMessage("email") }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Phone Number</mat-label>
+              <input matInput formControlName="phone" [readonly]="!isEditing" />
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('phone')?.invalid &&
+                  customerForm.get('phone')?.touched
+                "
+              >
+                {{ getErrorMessage("phone") }}
+              </mat-error>
+            </mat-form-field> -->
+          </div>
+
+          <!-- <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Date of Birth</mat-label>
+              <input
+                matInput
+                [matDatepicker]="dobPicker"
+                formControlName="dateOfBirth"
+                [readonly]="!isEditing"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="dobPicker"
+                [disabled]="!isEditing"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #dobPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>National ID / SSN</mat-label>
+              <input
+                matInput
+                formControlName="nationalId"
+                [readonly]="!isEditing"
+              />
+              <mat-icon matSuffix>fingerprint</mat-icon>
+            </mat-form-field>
+          </div> -->
+
+          <!-- <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Address</mat-label>
+              <textarea
+                matInput
+                formControlName="address"
+                rows="2"
+                [readonly]="!isEditing"
+              ></textarea>
+              <mat-icon matSuffix>home</mat-icon>
+            </mat-form-field>
+          </div> -->
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Account Information Card -->
+      <mat-card class="form-section">
+        <mat-card-header class="section-header">
+          <mat-icon mat-card-avatar class="section-icon">business</mat-icon>
+          <mat-card-title class="section-title"
+            >Account Information</mat-card-title
+          >
+          <mat-card-subtitle
+            >Customer type, status, and professional details</mat-card-subtitle
+          >
+        </mat-card-header>
+
+        <mat-card-content class="section-content">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Customer Type</mat-label>
+              <mat-select
+                formControlName="customerType"
+                [disabled]="!isEditing"
+              >
+                <mat-option
+                  *ngFor="let type of customerTypes"
+                  [value]="type.value"
+                >
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('customerType')?.invalid &&
+                  customerForm.get('customerType')?.touched
+                "
+              >
+                {{ getErrorMessage("customerType") }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Account Status</mat-label>
+              <mat-select formControlName="status" [disabled]="!isEditing">
+                <mat-option
+                  *ngFor="let status of statusOptions"
+                  [value]="status.value"
+                >
+                  {{ status.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>info</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('status')?.invalid &&
+                  customerForm.get('status')?.touched
+                "
+              >
+                {{ getErrorMessage("status") }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Occupation</mat-label>
+              <input
+                matInput
+                formControlName="occupation"
+                [readonly]="!isEditing"
+              />
+              <mat-icon matSuffix>work</mat-icon>
+              <mat-error
+                *ngIf="
+                  customerForm.get('occupation')?.invalid &&
+                  customerForm.get('occupation')?.touched
+                "
+              >
+                {{ getErrorMessage("occupation") }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Action Buttons -->
+      <div class="form-actions" *ngIf="isEditing">
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="customerForm.invalid || isLoading"
+          class="save-btn"
+        >
+          <mat-icon>save</mat-icon>
+          {{ isLoading ? "Saving..." : "Save Changes" }}
+        </button>
+
+        <button
+          type="button"
+          mat-button
+          (click)="onCancel()"
+          [disabled]="isLoading"
+          class="cancel-btn"
+        >
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+
+        <mat-divider [vertical]="true" class="action-divider"></mat-divider>
+
+        <button
+          type="button"
+          mat-button
+          color="warn"
+          (click)="onDeactivateCustomer()"
+          [disabled]="isLoading || currentCustomer!.status === 'INACTIVE'"
+          class="deactivate-btn"
+        >
+          <mat-icon>block</mat-icon>
+          Deactivate Customer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <mat-icon class="loading-spinner">refresh</mat-icon>
+      <span>Processing...</span>
+    </div>
+  </div>
+</div>

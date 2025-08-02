@@ -1,0 +1,93 @@
+<div class="unauthorized-container">
+  <!-- Background Pattern -->
+  <div class="background-pattern"></div>
+
+  <!-- Main Content -->
+  <div class="unauthorized-content">
+    <!-- Bank Logo Section -->
+    <div class="logo-section">
+      <div class="bank-logo-large">
+        <span class="bank-icon-large">🏦</span>
+        <span class="bank-name-large">Secure Bank</span>
+      </div>
+    </div>
+
+    <!-- Error Card -->
+    <mat-card class="error-card">
+      <mat-card-content class="card-content">
+        <!-- Error Icon -->
+        <div class="error-icon-container">
+          <div class="error-icon">
+            <mat-icon class="shield-icon">security</mat-icon>
+          </div>
+          <div class="error-status">403</div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message">
+          <h1 class="error-title">Access Denied</h1>
+          <h2 class="error-subtitle">Unauthorized Access</h2>
+          <p class="error-description">
+            You don't have permission to access this banking resource. This area
+            requires special authorization or elevated privileges.
+          </p>
+
+          <!-- Security Notice -->
+          <div class="security-notice">
+            <mat-icon class="notice-icon">info</mat-icon>
+            <span class="notice-text">
+              For your security, this attempt has been logged and our security
+              team has been notified.
+            </span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            class="primary-action"
+            (click)="goToDashboard()"
+          >
+            <mat-icon>dashboard</mat-icon>
+            Go to Dashboard
+          </button>
+
+          <button mat-raised-button class="secondary-action" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Go Back
+          </button>
+        </div>
+
+        <!-- Additional Options -->
+        <div class="additional-options">
+          <button mat-button class="text-action" (click)="contactSupport()">
+            <mat-icon>support_agent</mat-icon>
+            Contact Support
+          </button>
+
+          <button mat-button class="text-action logout-btn" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            Logout
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Footer -->
+    <div class="error-footer">
+      <p class="footer-text">
+        If you believe this is an error, please contact your account manager or
+        our support team.
+      </p>
+      <div class="footer-links">
+        <span class="footer-link">Privacy Policy</span>
+        <span class="separator">•</span>
+        <span class="footer-link">Terms of Service</span>
+        <span class="separator">•</span>
+        <span class="footer-link">Security Center</span>
+      </div>
+    </div>
+  </div>
+</div>

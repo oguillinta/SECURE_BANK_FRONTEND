@@ -1,0 +1,529 @@
+<div class="account-freeze-container">
+  <!-- Loading Account Data -->
+  <div class="loading-account" *ngIf="isLoadingAccount">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-icon class="loading-spinner">account_balance</mat-icon>
+          <h3>Loading Account Details...</h3>
+          <p>Please wait while we fetch the account information.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Content - Only show when account is loaded -->
+  <div *ngIf="isAccountLoaded()">
+    <!-- Header Section -->
+    <div class="freeze-header">
+      <div class="header-content">
+        <div class="account-info">
+          <div class="account-icon">
+            <mat-icon>ac_unit</mat-icon>
+          </div>
+          <div class="account-details">
+            <h1 class="page-title">Account Freeze Management</h1>
+            <p class="account-subtitle">
+              {{ selectedAccount!.accountNumber }} •
+              {{ getCustomerName() }}
+            </p>
+            <div class="account-status">
+              <mat-chip [ngClass]="getStatusChipClass()">
+                <mat-icon *ngIf="selectedAccount!.status === 'ACTIVE'"
+                  >check_circle</mat-icon
+                >
+                <mat-icon *ngIf="selectedAccount!.status === 'FROZEN'"
+                  >ac_unit</mat-icon
+                >
+                <mat-icon *ngIf="selectedAccount!.status === 'SUSPENDED'"
+                  >warning</mat-icon
+                >
+                <mat-icon *ngIf="selectedAccount!.status === 'CLOSED'"
+                  >block</mat-icon
+                >
+                {{ selectedAccount!.status }}
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onViewAccountDetails()"
+            matTooltip="View account details"
+          >
+            <mat-icon>info</mat-icon>
+            Account Details
+          </button>
+
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onViewTransactionHistory()"
+            matTooltip="View transaction history"
+          >
+            <mat-icon>history</mat-icon>
+            Transactions
+          </button>
+
+          <button
+            mat-button
+            class="action-btn"
+            (click)="onGenerateFreezeReport()"
+            matTooltip="Generate freeze report"
+          >
+            <mat-icon>assessment</mat-icon>
+            Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Account Summary -->
+      <div class="account-summary">
+        <div class="summary-item">
+          <span class="summary-label">Account Type</span>
+          <span class="summary-value">{{ getAccountTypeLabel() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Current Balance</span>
+          <span class="summary-value">{{
+            formatCurrency(selectedAccount!.balance)
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Daily Limit</span>
+          <span class="summary-value">{{
+            formatCurrency(selectedAccount!.getDailyTransactionLimit)
+          }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Last Updated</span>
+          <span class="summary-value">{{
+            selectedAccount!.updatedAt
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unfreeze Section (if account is frozen) -->
+    <div class="unfreeze-section" *ngIf="isAccountFrozen()">
+      <mat-card class="warning-card">
+        <mat-card-content>
+          <div class="warning-content">
+            <mat-icon class="warning-icon">warning</mat-icon>
+            <div class="warning-text">
+              <h3>Account Currently Frozen</h3>
+              <p>
+                This account is currently frozen and all transactions are
+                blocked. To restore account operations, click the unfreeze
+                button below.
+              </p>
+            </div>
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="onUnfreezeAccount()"
+              [disabled]="isLoading"
+              class="unfreeze-btn"
+            >
+              <mat-icon>play_arrow</mat-icon>
+              Unfreeze Account
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Freeze Process Stepper (if account is not frozen) -->
+    <div class="freeze-process" *ngIf="!isAccountFrozen()">
+      <mat-stepper [linear]="isLinear" #stepper>
+        <!-- Step 1: Freeze Details -->
+        <mat-step [stepControl]="freezeForm" label="Freeze Details">
+          <form [formGroup]="freezeForm">
+            <mat-card class="step-card">
+              <mat-card-header class="step-header">
+                <mat-icon mat-card-avatar class="step-icon">ac_unit</mat-icon>
+                <mat-card-title>Freeze Configuration</mat-card-title>
+                <mat-card-subtitle
+                  >Configure the account freeze parameters</mat-card-subtitle
+                >
+              </mat-card-header>
+
+              <mat-card-content class="step-content">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Account Number</mat-label>
+                    <input matInput formControlName="accountNumber" readonly />
+                    <mat-icon matSuffix>account_balance</mat-icon>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Account Type</mat-label>
+                    <input matInput [value]="getAccountTypeLabel()" readonly />
+                    <mat-icon matSuffix>category</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Freeze Type</mat-label>
+                    <mat-select
+                      formControlName="freezeType"
+                      (selectionChange)="onFreezeTypeChange()"
+                    >
+                      <mat-option
+                        *ngFor="let type of freezeTypes"
+                        [value]="type.value"
+                      >
+                        <div class="freeze-option">
+                          <span class="option-label">{{ type.label }}</span>
+                          <span class="option-description">{{
+                            type.description
+                          }}</span>
+                        </div>
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>security</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('freezeType')?.invalid &&
+                        freezeForm.get('freezeType')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "freezeType") }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field
+                    appearance="outline"
+                    class="form-field"
+                    *ngIf="
+                      freezeForm.get('freezeType')?.value === 'PARTIAL_FREEZE'
+                    "
+                  >
+                    <mat-label>Transaction Limit</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="transactionLimit"
+                      placeholder="0.00"
+                    />
+                    <span matPrefix>$&nbsp;</span>
+                    <mat-icon matSuffix>attach_money</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('transactionLimit')?.invalid &&
+                        freezeForm.get('transactionLimit')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "transactionLimit") }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Reason for Freeze</mat-label>
+                    <mat-select formControlName="reason">
+                      <mat-option
+                        *ngFor="let reason of freezeReasons"
+                        [value]="reason.value"
+                      >
+                        {{ reason.label }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>gavel</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('reason')?.invalid &&
+                        freezeForm.get('reason')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "reason") }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Authorized By</mat-label>
+                    <mat-select formControlName="authorizedBy">
+                      <mat-option
+                        *ngFor="let officer of authorizedOfficers"
+                        [value]="officer.value"
+                      >
+                        {{ officer.label }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>verified_user</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('authorizedBy')?.invalid &&
+                        freezeForm.get('authorizedBy')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "authorizedBy") }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Review Date</mat-label>
+                    <input
+                      matInput
+                      [matDatepicker]="reviewPicker"
+                      formControlName="reviewDate"
+                    />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="reviewPicker"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #reviewPicker></mat-datepicker>
+                    <mat-hint>Date when freeze should be reviewed</mat-hint>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('reviewDate')?.invalid &&
+                        freezeForm.get('reviewDate')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "reviewDate") }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field
+                    appearance="outline"
+                    class="form-field full-width"
+                  >
+                    <mat-label>Comments</mat-label>
+                    <textarea
+                      matInput
+                      formControlName="comments"
+                      rows="4"
+                      placeholder="Provide detailed explanation for the freeze action..."
+                    ></textarea>
+                    <mat-hint>Minimum 10 characters required</mat-hint>
+                    <mat-error
+                      *ngIf="
+                        freezeForm.get('comments')?.invalid &&
+                        freezeForm.get('comments')?.touched
+                      "
+                    >
+                      {{ getErrorMessage(freezeForm, "comments") }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-options">
+                  <div class="options-header">
+                    <h4>Additional Options</h4>
+                    <p>Configure additional freeze parameters</p>
+                  </div>
+
+                  <mat-checkbox
+                    formControlName="urgentFreeze"
+                    class="urgent-option"
+                  >
+                    <span class="checkbox-label">
+                      <strong>Urgent Freeze (Immediate Effect)</strong>
+                      <span class="checkbox-description"
+                        >Apply freeze immediately without standard processing
+                        delay</span
+                      >
+                    </span>
+                  </mat-checkbox>
+
+                  <mat-checkbox
+                    formControlName="notifyCustomer"
+                    class="notify-option"
+                  >
+                    <span class="checkbox-label">
+                      <strong>Notify Customer</strong>
+                      <span class="checkbox-description"
+                        >Send automated notification to customer about account
+                        freeze</span
+                      >
+                    </span>
+                  </mat-checkbox>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions class="step-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  matStepperNext
+                  [disabled]="freezeForm.invalid"
+                >
+                  Next: Confirmation
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </form>
+        </mat-step>
+
+        <!-- Step 2: Confirmation -->
+        <mat-step [stepControl]="confirmationForm" label="Confirmation">
+          <form [formGroup]="confirmationForm">
+            <mat-card class="step-card">
+              <mat-card-header class="step-header">
+                <mat-icon mat-card-avatar class="step-icon warning"
+                  >warning</mat-icon
+                >
+                <mat-card-title>Confirm Account Freeze</mat-card-title>
+                <mat-card-subtitle
+                  >Review and confirm the freeze action</mat-card-subtitle
+                >
+              </mat-card-header>
+
+              <mat-card-content class="step-content">
+                <!-- Freeze Summary -->
+                <div class="freeze-summary">
+                  <h3>Freeze Summary</h3>
+                  <div class="summary-grid">
+                    <div class="summary-row">
+                      <span class="label">Account:</span>
+                      <span class="value">{{
+                        selectedAccount!.accountNumber
+                      }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Customer ID:</span>
+                      <span class="value">{{
+                        selectedAccount!.customerId
+                      }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Account Type:</span>
+                      <span class="value">{{ getAccountTypeLabel() }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Current Balance:</span>
+                      <span class="value">{{
+                        formatCurrency(selectedAccount!.balance)
+                      }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Freeze Type:</span>
+                      <span class="value">{{
+                        freezeForm.get("freezeType")?.value
+                      }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Reason:</span>
+                      <span class="value">{{
+                        freezeForm.get("reason")?.value
+                      }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Authorized By:</span>
+                      <span class="value">{{
+                        freezeForm.get("authorizedBy")?.value
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-divider class="section-divider"></mat-divider>
+
+                <!-- Confirmation Fields -->
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Type Account Number to Confirm</mat-label>
+                    <input
+                      matInput
+                      formControlName="confirmAccountNumber"
+                      placeholder="{{ selectedAccount!.accountNumber }}"
+                    />
+                    <mat-icon matSuffix>verified</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        confirmationForm.get('confirmAccountNumber')?.invalid &&
+                        confirmationForm.get('confirmAccountNumber')?.touched
+                      "
+                    >
+                      {{
+                        getErrorMessage(
+                          confirmationForm,
+                          "confirmAccountNumber"
+                        )
+                      }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Officer Digital Signature</mat-label>
+                    <input
+                      matInput
+                      formControlName="officerSignature"
+                      placeholder="Enter your digital signature"
+                    />
+                    <mat-icon matSuffix>edit</mat-icon>
+                    <mat-error
+                      *ngIf="
+                        confirmationForm.get('officerSignature')?.invalid &&
+                        confirmationForm.get('officerSignature')?.touched
+                      "
+                    >
+                      {{
+                        getErrorMessage(confirmationForm, "officerSignature")
+                      }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="confirmation-checkbox">
+                  <mat-checkbox formControlName="confirmFreeze" color="warn">
+                    <span class="checkbox-label">
+                      I confirm that I have the authority to freeze this account
+                      and understand the implications of this action.
+                    </span>
+                  </mat-checkbox>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions class="step-actions">
+                <button mat-button matStepperPrevious>Back</button>
+                <button
+                  mat-raised-button
+                  color="warn"
+                  (click)="onSubmitFreeze()"
+                  [disabled]="confirmationForm.invalid || isLoading"
+                  class="freeze-btn"
+                >
+                  <mat-icon>ac_unit</mat-icon>
+                  {{ isLoading ? "Processing..." : "Freeze Account" }}
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </form>
+        </mat-step>
+      </mat-stepper>
+    </div>
+
+    <!-- Cancel Button -->
+    <div class="cancel-section" *ngIf="!isAccountFrozen()">
+      <button
+        mat-button
+        (click)="onCancel()"
+        [disabled]="isLoading"
+        class="cancel-btn"
+      >
+        <mat-icon>cancel</mat-icon>
+        Cancel Operation
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <mat-icon class="loading-spinner">ac_unit</mat-icon>
+      <span>{{
+        isAccountFrozen() ? "Unfreezing Account..." : "Freezing Account..."
+      }}</span>
+    </div>
+  </div>
+</div>

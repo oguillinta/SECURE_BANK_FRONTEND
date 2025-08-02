@@ -1,0 +1,233 @@
+<div class="accounts-container">
+  <!-- Header Section -->
+  <div class="accounts-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h1 class="page-title">My Accounts</h1>
+        <p class="customer-info">
+          {{ userFullName }} • Customer ID: {{ customerId }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          class="new-account-btn"
+          (click)="onOpenNewAccount()"
+        >
+          <mat-icon>add</mat-icon>
+          Open New Account
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Balance</div>
+          <div class="summary-value">{{ formatCurrency(totalBalance) }}</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon active">
+          <mat-icon>verified</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Active Accounts</div>
+          <div class="summary-value">{{ activeAccounts }}</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon loans">
+          <mat-icon>credit_score</mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Outstanding Loans</div>
+          <div class="summary-value">1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accounts List -->
+  <div class="accounts-list">
+    <div class="accounts-grid">
+      <mat-card
+        *ngFor="let account of accounts"
+        class="account-card"
+        [ngClass]="'account-' + account.accountType.toLowerCase()"
+      >
+        <mat-card-header class="account-header">
+          <div class="account-icon" mat-card-avatar>
+            <mat-icon>{{ getAccountIcon(account.accountType) }}</mat-icon>
+          </div>
+
+          <mat-card-title class="account-title">
+            {{ getAccountTypeLabel(account.accountType) }}
+          </mat-card-title>
+
+          <mat-card-subtitle class="account-number">
+            {{ account.accountNumber }}
+          </mat-card-subtitle>
+
+          <div class="account-menu">
+            <button mat-icon-button [matMenuTriggerFor]="accountMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #accountMenu="matMenu">
+              <button mat-menu-item (click)="onAccountDetails(account)">
+                <mat-icon>info</mat-icon>
+                <span>Account Details</span>
+              </button>
+              <button mat-menu-item (click)="onViewStatement(account)">
+                <mat-icon>receipt_long</mat-icon>
+                <span>View Statement</span>
+              </button>
+              <button mat-menu-item (click)="onDownloadStatement(account)">
+                <mat-icon>download</mat-icon>
+                <span>Download Statement</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button
+                mat-menu-item
+                (click)="onFreezeAccount(account)"
+                class="freeze-option"
+              >
+                <mat-icon>ac_unit</mat-icon>
+                <span>Freeze Account</span>
+              </button>
+            </mat-menu>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="account-content">
+          <!-- Balance Section -->
+          <div class="balance-section">
+            <div class="balance-label">Current Balance</div>
+            <div
+              class="balance-amount"
+              [ngClass]="account.balance >= 0 ? 'positive' : 'negative'"
+            >
+              {{ formatCurrency(account.balance) }}
+            </div>
+          </div>
+
+          <!-- Account Status -->
+          <div class="account-status">
+            <mat-chip [ngClass]="getStatusChipClass(account.status)">
+              <mat-icon *ngIf="account.status === 'ACTIVE'"
+                >check_circle</mat-icon
+              >
+              <mat-icon *ngIf="account.status !== 'ACTIVE'">cancel</mat-icon>
+              {{ account.status }}
+            </mat-chip>
+          </div>
+
+          <!-- Transaction Limit (for non-loan accounts) -->
+          <div
+            *ngIf="
+              account.accountType !== 'LOAN' &&
+              account.getDailyTransactionLimit > 0
+            "
+            class="limit-section"
+          >
+            <div class="limit-info">
+              <span class="limit-label">Daily Limit</span>
+              <span class="limit-amount">{{
+                formatCurrency(account.getDailyTransactionLimit)
+              }}</span>
+            </div>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="getUsagePercentage(account)"
+              class="limit-progress"
+            >
+            </mat-progress-bar>
+            <div class="limit-usage">
+              {{ getUsagePercentage(account).toFixed(0) }}% of limit
+            </div>
+          </div>
+
+          <!-- Account Dates -->
+          <div class="account-dates">
+            <div class="date-item">
+              <span class="date-label">Opened:</span>
+              <span class="date-value">{{ account.createdAt }}</span>
+            </div>
+            <div class="date-item">
+              <span class="date-label">Last Updated:</span>
+              <span class="date-value">{{ account.updatedAt }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+
+        <!-- <mat-card-actions class="account-actions">
+          <button
+            mat-button
+            class="action-btn transfer"
+            (click)="onTransfer(account)"
+          >
+            <mat-icon>swap_horiz</mat-icon>
+            Transfer
+          </button>
+
+          <button
+            mat-button
+            class="action-btn pay"
+            (click)="onPayBills(account)"
+            *ngIf="
+              account.accountType === 'CHECKING' ||
+              account.accountType === 'BUSINESS'
+            "
+          >
+            <mat-icon>payment</mat-icon>
+            Pay Bills
+          </button>
+
+          <button
+            mat-button
+            class="action-btn statement"
+            (click)="onViewStatement(account)"
+          >
+            <mat-icon>receipt_long</mat-icon>
+            Statement
+          </button>
+        </mat-card-actions> -->
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Quick Actions Footer -->
+  <!-- <div class="quick-actions-footer">
+    <h3 class="footer-title">Quick Actions</h3>
+    <div class="footer-actions">
+      <button mat-raised-button class="footer-action transfer">
+        <mat-icon>swap_horiz</mat-icon>
+        Transfer Between Accounts
+      </button>
+
+      <button mat-raised-button class="footer-action deposit">
+        <mat-icon>add_circle</mat-icon>
+        Make Deposit
+      </button>
+
+      <button mat-raised-button class="footer-action history">
+        <mat-icon>history</mat-icon>
+        Transaction History
+      </button>
+
+      <button mat-raised-button class="footer-action support">
+        <mat-icon>support_agent</mat-icon>
+        Contact Support
+      </button>
+    </div>
+  </div> -->
+</div>
+
+<!-- formatDate(account.updatedAt) -->

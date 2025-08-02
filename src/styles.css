@@ -1,1 +1,303 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Status Chip Styles *//* Global Styles for Banking Application */
+
+/* Import Angular Material theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Global dropdown/select overrides - remove red backgrounds */
+.mat-mdc-select-panel {
+  background-color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.mat-mdc-option {
+  background-color: white !important;
+  color: #333333 !important;
+  padding: 12px 16px !important;
+}
+
+.mat-mdc-option:hover {
+  background-color: #f8f9fa !important;
+  color: #333333 !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+/* Override CDK overlay backgrounds */
+.cdk-overlay-container .mat-mdc-select-panel {
+  background-color: white !important;
+}
+
+.cdk-overlay-container .mat-mdc-option {
+  background-color: white !important;
+  color: #333333 !important;
+}
+
+/* Remove Material theme red/pink colors from dropdowns globally */
+.mat-accent .mat-mdc-option,
+.mat-primary .mat-mdc-option,
+.mat-warn .mat-mdc-option {
+  background-color: white !important;
+  color: #333333 !important;
+}
+
+.mat-accent .mat-mdc-select-panel,
+.mat-primary .mat-mdc-select-panel,
+.mat-warn .mat-mdc-select-panel {
+  background-color: white !important;
+}
+.status-active {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+}
+
+.status-inactive {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+.status-suspended {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffeaa7 !important;
+}
+
+.status-pending {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+  border: 1px solid #bee5eb !important;
+}
+
+.status-closed {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f5c6cb !important;
+}
+
+.status-frozen {
+  background-color: #cce7ff !important;
+  color: #004085 !important;
+  border: 1px solid #b8daff !important;
+}
+
+.status-active mat-icon,
+.status-inactive mat-icon,
+.status-suspended mat-icon,
+.status-pending mat-icon,
+.status-closed mat-icon,
+.status-frozen mat-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-right: 4px !important;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: #fafafa;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Custom Material Design overrides for banking theme */
+.mat-toolbar {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+.mat-sidenav {
+  background-color: #ffffff !important;
+}
+
+.mat-sidenav-content {
+  background-color: #fafafa !important;
+}
+
+/* Custom color palette for banking */
+:root {
+  --bank-primary: #dc3545;
+  --bank-primary-light: #ff6b7a;
+  --bank-primary-dark: #a71e2a;
+  --bank-secondary: #ffffff;
+  --bank-accent: #28a745;
+  --bank-warn: #ffc107;
+  --bank-background: #fafafa;
+  --bank-surface: #ffffff;
+  --bank-text-primary: #333333;
+  --bank-text-secondary: #666666;
+  --bank-border: #e0e0e0;
+}
+
+/* Override Material theme colors */
+.mat-primary {
+  background-color: var(--bank-primary) !important;
+  color: white !important;
+}
+
+.mat-accent {
+  background-color: var(--bank-accent) !important;
+  color: white !important;
+}
+
+.mat-warn {
+  background-color: var(--bank-warn) !important;
+  color: #333333 !important;
+}
+
+/* Material button overrides */
+.mat-raised-button.mat-primary {
+  background-color: var(--bank-primary);
+  color: white;
+}
+
+.mat-raised-button.mat-accent {
+  background-color: var(--bank-accent);
+  color: white;
+}
+
+/* Material form field customization */
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: var(--bank-primary);
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: var(--bank-primary);
+}
+
+/* Badge customization */
+.mat-badge-content {
+  background-color: var(--bank-primary) !important;
+  color: white !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Focus styles for accessibility */
+.mat-button:focus,
+.mat-raised-button:focus,
+.mat-icon-button:focus {
+  outline: 2px solid var(--bank-primary);
+  outline-offset: 2px;
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.p-1 { padding: 8px; }
+.p-2 { padding: 16px; }
+.p-3 { padding: 24px; }
+.p-4 { padding: 32px; }
+
+/* Banking specific utilities */
+.balance-positive {
+  color: var(--bank-accent) !important;
+  font-weight: 600;
+}
+
+.balance-negative {
+  color: var(--bank-primary) !important;
+  font-weight: 600;
+}
+
+.currency {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

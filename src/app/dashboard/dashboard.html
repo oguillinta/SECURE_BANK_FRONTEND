@@ -1,0 +1,121 @@
+<!-- Quick Stats Cards -->
+<div class="stats-container">
+  <div class="stat-card">
+    <div class="stat-icon">
+      <mat-icon>account_balance_wallet</mat-icon>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Checking Account</div>
+      <div class="stat-value">$8,450.25</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <mat-icon>savings</mat-icon>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Savings Account</div>
+      <div class="stat-value">$16,130.25</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <mat-icon>credit_card</mat-icon>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Credit Card</div>
+      <div class="stat-value">-$1,245.80</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon">
+      <mat-icon>trending_up</mat-icon>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Investments</div>
+      <div class="stat-value">$45,890.15</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="dashboard-content">
+  <div class="content-section">
+    <h2 class="section-title">Recent Transactions</h2>
+    <div class="transactions-list">
+      <div class="transaction-item">
+        <div class="transaction-info">
+          <mat-icon class="transaction-icon">shopping_cart</mat-icon>
+          <div class="transaction-details">
+            <div class="transaction-description">Amazon Purchase</div>
+            <div class="transaction-date">Today, 2:30 PM</div>
+          </div>
+        </div>
+        <div class="transaction-amount negative">-$89.99</div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-info">
+          <mat-icon class="transaction-icon">local_gas_station</mat-icon>
+          <div class="transaction-details">
+            <div class="transaction-description">Shell Gas Station</div>
+            <div class="transaction-date">Yesterday, 4:15 PM</div>
+          </div>
+        </div>
+        <div class="transaction-amount negative">-$45.20</div>
+      </div>
+
+      <div class="transaction-item">
+        <div class="transaction-info">
+          <mat-icon class="transaction-icon">account_balance</mat-icon>
+          <div class="transaction-details">
+            <div class="transaction-description">Salary Deposit</div>
+            <div class="transaction-date">3 days ago</div>
+          </div>
+        </div>
+        <div class="transaction-amount positive">+$3,250.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="quick-actions">
+      <button
+        mat-raised-button
+        class="action-btn transfer"
+        (click)="onTransferClick()"
+      >
+        <mat-icon>swap_horiz</mat-icon>
+        Transfer Money
+      </button>
+      <button
+        mat-raised-button
+        class="action-btn payment"
+        (click)="onPayBillsClick()"
+      >
+        <mat-icon>payment</mat-icon>
+        Pay Bills
+      </button>
+      <button
+        mat-raised-button
+        class="action-btn deposit"
+        (click)="onDepositClick()"
+      >
+        <mat-icon>add_circle</mat-icon>
+        Make Deposit
+      </button>
+      <button
+        mat-raised-button
+        class="action-btn statement"
+        (click)="onStatementClick()"
+      >
+        <mat-icon>receipt_long</mat-icon>
+        View Statement
+      </button>
+    </div>
+  </div>
+</div>
