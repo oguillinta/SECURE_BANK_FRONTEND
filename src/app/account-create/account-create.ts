@@ -22,6 +22,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { AccountService } from '../account.service';
+import { CustomerService } from '../customer.service';
+import { GetAllCustomersResponse } from '../interfaces/get-all-customers-response.interface';
 
 export interface AccountCreateRequest {
   customerId: string;
@@ -74,90 +76,10 @@ export class AccountCreateComponent implements OnInit {
   isLoading = false;
   currentStep = 1; // 1: Customer Selection, 2: Account Config, 3: Confirmation
   private accountService = inject(AccountService);
+  private customerService = inject(CustomerService);
 
-  // Customer data
-  customers: Customer[] = [
-    {
-      customerId: 'TEST-001',
-      firstName: 'Oscar',
-      lastName: 'Guillinta',
-      email: 'oscar.guillinta93@outlook.com',
-      phone: '+1-555-0123',
-      customerType: 'BUSINESS',
-      status: 'ACTIVE',
-      totalBalance: 156275.65,
-      accountsCount: 4,
-      lastActivity: new Date('2025-01-20T16:05:06Z'),
-      createdAt: new Date('2023-03-15T09:30:00Z'),
-    },
-    {
-      customerId: 'TEST-007',
-      firstName: 'David',
-      lastName: 'Bringas',
-      email: 'dbringas@outlook.com',
-      phone: '+1-555-0234',
-      customerType: 'PERSONAL',
-      status: 'ACTIVE',
-      totalBalance: 45890.3,
-      accountsCount: 2,
-      lastActivity: new Date('2025-01-19T14:22:15Z'),
-      createdAt: new Date('2023-05-22T11:15:00Z'),
-    },
-    {
-      customerId: 'CUST004',
-      firstName: 'Michael',
-      lastName: 'Chen',
-      email: 'michael.chen@techcorp.com',
-      phone: '+1-555-0345',
-      customerType: 'VIP',
-      status: 'ACTIVE',
-      totalBalance: 892150.75,
-      accountsCount: 6,
-      lastActivity: new Date('2025-01-21T10:30:45Z'),
-      createdAt: new Date('2022-11-08T14:20:00Z'),
-    },
-    {
-      customerId: 'CUST005',
-      firstName: 'Jennifer',
-      lastName: 'Brown',
-      email: 'jen.brown@smallbiz.com',
-      phone: '+1-555-0678',
-      customerType: 'BUSINESS',
-      status: 'INACTIVE',
-      totalBalance: 0.0,
-      accountsCount: 0,
-      lastActivity: new Date('2024-12-15T09:45:00Z'),
-      createdAt: new Date('2023-08-12T10:00:00Z'),
-    },
-    {
-      customerId: 'CUST006',
-      firstName: 'Emily',
-      lastName: 'Rodriguez',
-      email: 'e.rodriguez@globalsolutions.com',
-      phone: '+1-555-0456',
-      customerType: 'CORPORATE',
-      status: 'ACTIVE',
-      totalBalance: 2456780.9,
-      accountsCount: 12,
-      lastActivity: new Date('2025-01-21T15:20:30Z'),
-      createdAt: new Date('2022-06-03T08:45:00Z'),
-    },
-    {
-      customerId: 'CUST007',
-      firstName: 'David',
-      lastName: 'Williams',
-      email: 'david.williams@email.com',
-      phone: '+1-555-0567',
-      customerType: 'PERSONAL',
-      status: 'SUSPENDED',
-      totalBalance: 8920.45,
-      accountsCount: 1,
-      lastActivity: new Date('2025-01-10T12:15:20Z'),
-      createdAt: new Date('2023-12-01T16:30:00Z'),
-    },
-  ];
-
-  filteredCustomers: Customer[] = [];
+  customers: GetAllCustomersResponse[] = [];
+  filteredCustomers: GetAllCustomersResponse[] = [];
   selectedCustomer: Customer | null = null;
 
   // Account types configuration
@@ -223,9 +145,10 @@ export class AccountCreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.filteredCustomers = this.customers.filter(
-      (c) => c.status === 'ACTIVE'
-    );
+    // this.filteredCustomers = this.customers.filter(
+    //   (c) => c.status === 'ACTIVE'
+    // );
+    this.getAllFilteredCustomers();
   }
 
   private initializeForms(): void {
@@ -252,6 +175,19 @@ export class AccountCreateComponent implements OnInit {
       status: ['ACTIVE', Validators.required],
       agreementAccepted: [false, Validators.requiredTrue],
       notifyCustomer: [true],
+    });
+  }
+
+  getAllFilteredCustomers(): void {
+    this.customerService.getAll().subscribe({
+      next: (customers) => {
+        this.filteredCustomers = customers.filter(
+          (customer) => customer.status === 'ACTIVE'
+        );
+      },
+      error: (error: any) => {
+        console.log(error);
+      },
     });
   }
 
@@ -335,17 +271,9 @@ export class AccountCreateComponent implements OnInit {
           aValue = a.status;
           bValue = b.status;
           break;
-        case 'totalBalance':
-          aValue = a.totalBalance;
-          bValue = b.totalBalance;
-          break;
         case 'createdAt':
-          aValue = a.createdAt.getTime();
-          bValue = b.createdAt.getTime();
-          break;
-        case 'lastActivity':
-          aValue = a.lastActivity.getTime();
-          bValue = b.lastActivity.getTime();
+          aValue = a.createdAt;
+          bValue = b.createdAt;
           break;
         default:
           aValue = a.lastName;
