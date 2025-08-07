@@ -11,6 +11,12 @@ import { AccountService } from '../account.service';
 import { AccountSummary } from '../interfaces/account-summary-response.interface';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { UserService } from '../user.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
+import { filter, take } from 'rxjs';
+import { InteractionStatus } from '@azure/msal-browser';
+import { MsalBroadcastService } from '@azure/msal-angular';
 
 export interface BankAccount {
   accountNumber: string;
@@ -22,6 +28,14 @@ export interface BankAccount {
   createdAt: string;
   updatedAt: string;
 }
+
+type ProfileType = {
+  givenName?: string;
+  surname?: string;
+  userPrincipalName?: string;
+  id?: string;
+  displayName?: string;
+};
 
 @Component({
   selector: 'account-list',
@@ -40,9 +54,10 @@ export interface BankAccount {
 })
 export class AccountListComponent implements OnInit {
   private accountService = inject(AccountService);
-  private authService = inject(AuthService);
+  private userService = inject(UserService);
   private router = inject(Router);
-
+  private http = inject(HttpClient);
+  profile: ProfileType | undefined;
   // customerName = 'John Doe';
   customerId = 'BUS-456789123';
 
@@ -53,30 +68,39 @@ export class AccountListComponent implements OnInit {
 
   ngOnInit() {
     this.calculateTotals();
+    this.getProfile(environment.apiConfig.uri);
+    //this.loadAccountsByCustomerEmail();
+
     this.loadAccountsByCustomerEmail();
-    this.authService.getToken();
+
+    //this.authService.getToken();
   }
 
-  get userFullName() {
-    return (
-      this.authService.getUserProfile()?.firstName +
-      ' ' +
-      this.authService.getUserProfile().lastName
-    );
-  }
+  // get userFullName() {
+  //   return 'Dummy user';
+  // }
 
   loadAccountsByCustomerEmail() {
-    this.accountService
-      .getAccountsSummaryByEmail(this.authService.getUserProfile().email)
-      .subscribe({
-        next: (accounts) => {
-          console.log('Accounts loaded:', accounts);
-          this.accounts = accounts;
-        },
-        error: (error) => {
-          console.error('Error loading accounts:', error);
-        },
-      });
+    //const userPrincipal: string = this.profile?.userPrincipalName ?? '';
+
+    this.userService.getCurrentUserEmail().subscribe({
+      next: (email) => {
+        console.log('User email:', email);
+
+        this.accountService.getAccountsSummaryByEmail(email).subscribe({
+          next: (accounts) => {
+            console.log('Accounts loaded:', accounts);
+            this.accounts = accounts;
+          },
+          error: (error) => {
+            console.error('Error loading accounts:', error);
+          },
+        });
+      },
+      error: (error) => {
+        console.error('Error getting user email:', error);
+      },
+    });
   }
 
   calculateTotals() {
@@ -164,16 +188,23 @@ export class AccountListComponent implements OnInit {
 
   onFreezeAccount(account: AccountSummary) {
     console.log('Freeze account:', account.accountNumber);
-    this.router.navigate(['/account-freeze', account.accountNumber]);
+    this.router.navigate(['/app/account-freeze', account.accountNumber]);
   }
 
   onOpenNewAccount() {
     console.log('Account create redirect...');
 
-    this.router.navigate(['/account-create']);
+    this.router.navigate(['/app/account-create']);
   }
 
   countActiveAccounts(): Number {
     return this.accounts.filter((account) => account.status == 'ACTIVE').length;
+  }
+
+  getProfile(url: string) {
+    this.http.get(url).subscribe((profile) => {
+      this.profile = profile;
+      console.log(profile);
+    });
   }
 }

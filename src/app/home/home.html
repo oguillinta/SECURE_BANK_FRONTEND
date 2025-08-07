@@ -1,0 +1,119 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="brand-section">
+        <div class="logo">
+          <span class="logo-icon">🏦</span>
+          <span class="logo-text">Secure Bank</span>
+        </div>
+        <p class="tagline">Your trusted financial partner</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="content-wrapper">
+      <!-- Not Logged In State -->
+      @if (!loginDisplay) {
+      <div class="auth-section">
+        <div class="welcome-card">
+          <div class="card-header">
+            <h1 class="welcome-title">Welcome to Secure Bank</h1>
+            <p class="welcome-subtitle">
+              This sample demonstrates how to configure MSAL Angular to login,
+              logout, protect a route, and acquire an access token for a
+              protected resource such as the Microsoft Graph.
+            </p>
+            <p class="signin-prompt">
+              Please sign-in to see your profile information.
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">📊</div>
+              <h3>Account Management</h3>
+              <p>View balances, transaction history, and account details</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">🔒</div>
+              <h3>Secure Access</h3>
+              <p>Protected by Microsoft Azure AD authentication</p>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">📈</div>
+              <h3>Financial Reports</h3>
+              <p>Comprehensive insights and account summaries</p>
+            </div>
+          </div>
+
+          <div class="auth-actions">
+            <button class="login-button primary" (click)="login()">
+              <span class="button-icon">🔐</span>
+              Sign In with Microsoft
+            </button>
+
+            <p class="auth-note">
+              <span class="note-icon">ℹ️</span>
+              Use your organizational account to access the banking portal
+            </p>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Logged In State -->
+      @if (loginDisplay) {
+      <div class="dashboard-preview">
+        <div class="success-card">
+          <div class="success-header">
+            <div class="success-icon">✅</div>
+            <div>
+              <h2 class="success-title">Login successful!</h2>
+              <p class="success-subtitle">
+                Request your profile information by clicking Profile above.
+              </p>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <h3>Quick Access</h3>
+            <div class="actions-grid">
+              <div class="action-card">
+                <div class="action-icon dashboard">📊</div>
+                <div class="action-content">
+                  <h4>Dashboard</h4>
+                  <p>View account overview</p>
+                </div>
+                <div class="action-arrow">→</div>
+              </div>
+
+              <div class="action-card">
+                <div class="action-icon accounts">💳</div>
+                <div class="action-content">
+                  <h4>Accounts</h4>
+                  <p>Manage your accounts</p>
+                </div>
+                <div class="action-arrow">→</div>
+              </div>
+
+              <div class="action-card">
+                <div class="action-icon reports">📈</div>
+                <div class="action-content">
+                  <h4>Reports</h4>
+                  <p>Financial summaries</p>
+                </div>
+                <div class="action-arrow">→</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

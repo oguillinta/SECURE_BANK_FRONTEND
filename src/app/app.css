@@ -4,3 +4,40 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  overflow: auto;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.title {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+.title:hover {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* Hide toolbar when in main app */
+.hide-toolbar .container {
+  height: 100vh;
+}
+
+/* Ensure no margin/padding issues */
+.hide-toolbar {
+  padding: 0;
+  margin: 0;
+}

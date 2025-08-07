@@ -8,7 +8,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterOutlet } from '@angular/router';
-import Keycloak, { KeycloakProfile } from 'keycloak-js';
+import { AuthService } from '../auth.service';
+import { MsalService } from '@azure/msal-angular';
+//import Keycloak, { KeycloakProfile } from 'keycloak-js';
 
 @Component({
   selector: 'main-layout',
@@ -28,25 +30,29 @@ import Keycloak, { KeycloakProfile } from 'keycloak-js';
 })
 export class MainLayoutComponent {
   title = 'RedBank - Modern Banking Application';
-  userProfile: KeycloakProfile | null = {};
+  //userProfile: KeycloakProfile | null = {};
 
-  private keycloak = inject(Keycloak);
+  //private keycloak = inject(Keycloak);
 
   ngOnInit(): void {
     this.loadUserProfile();
   }
   isSidenavOpen = true;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: MsalService) {}
 
   menuItems = [
-    { icon: 'dashboard', label: 'Dashboard', route: '/dashboard' },
-    { icon: 'account_balance_wallet', label: 'Accounts', route: '/accounts' },
-    { icon: 'people', label: 'Customers', route: '/customer-list' },
+    { icon: 'dashboard', label: 'Dashboard', route: '/app/dashboard' },
+    {
+      icon: 'account_balance_wallet',
+      label: 'Accounts',
+      route: '/app/accounts',
+    },
+    { icon: 'people', label: 'Customers', route: '/app/customer-list' },
     // { icon: 'swap_horiz', label: 'Transfers', route: '/transfers' },
     // { icon: 'payment', label: 'Payments', route: '/payments' },
     // { icon: 'credit_card', label: 'Cards', route: '/cards' },
-    { icon: 'trending_up', label: 'Report', route: '/account-summary' },
+    { icon: 'trending_up', label: 'Report', route: '/app/account-summary' },
     // { icon: 'receipt_long', label: 'Statements', route: '/statements' },
     //{ icon: 'ac_unit', label: 'Account Freeze', route: '/account-freeze' },
     // { icon: 'support_agent', label: 'Support', route: '/support' },
@@ -75,18 +81,18 @@ export class MainLayoutComponent {
 
   onLogout() {
     console.log('Logout user');
-    this.keycloak.logout();
+    this.authService.logout();
   }
 
   async loadUserProfile() {
-    if (this.keycloak?.authenticated) {
-      this.userProfile = await this.keycloak.loadUserProfile();
-      console.log(this.userProfile);
-    }
+    // if (this.keycloak?.authenticated) {
+    //   this.userProfile = await this.keycloak.loadUserProfile();
+    //   console.log(this.userProfile);
+    // }
   }
 
   login() {
-    this.keycloak.login();
+    //this.keycloak.login();
     sessionStorage.setItem('swLogin', '1');
   }
 }

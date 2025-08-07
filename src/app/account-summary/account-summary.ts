@@ -190,7 +190,7 @@ export class AccountSummaryComponent {
 
   onViewAccountDetails(accountType: string): void {
     console.log('View details for account type:', accountType);
-    this.router.navigate(['/accounts'], {
+    this.router.navigate(['/app/accounts'], {
       queryParams: { type: accountType },
     });
   }

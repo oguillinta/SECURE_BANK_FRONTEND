@@ -15,7 +15,7 @@ export class UnauthorizedComponent {
   constructor(private router: Router) {}
 
   goToDashboard() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/app/dashboard']);
   }
 
   goBack() {
@@ -25,7 +25,7 @@ export class UnauthorizedComponent {
   contactSupport() {
     // In a real app, this would open a support ticket or redirect to support
     console.log('Contact support clicked');
-    this.router.navigate(['/support']);
+    this.router.navigate(['/app/support']);
   }
 
   logout() {

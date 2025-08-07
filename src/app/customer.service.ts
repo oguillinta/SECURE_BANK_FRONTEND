@@ -23,7 +23,7 @@ export class CustomerService {
 
   getCustomerByEmail(email: string): Observable<GetCustomerByIdResponse> {
     return this.http.get<GetCustomerByIdResponse>(
-      `${this.baseUrl}/customers/${email}/email`
+      `${this.baseUrl}/customers/getByEmail/${email}`
     );
   }
 

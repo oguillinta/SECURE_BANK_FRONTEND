@@ -33,12 +33,16 @@ export class AccountService {
 
   getAccountsSummaryByEmail(email: string): Observable<AccountSummary[]> {
     return this.http
-      .get<GetCustomerByIdResponse>(`${this.baseUrl}/customers/${email}/email`)
+      .get<GetCustomerByIdResponse>(
+        `${this.baseUrl}/customers/GetByEmail/${email}`
+      )
       .pipe(
         switchMap((response: GetCustomerByIdResponse) => {
-          const customerId = response.customerId;
+          const customerId = response.id;
+          console.log('receiving response from get by email', response);
+
           return this.http.get<AccountSummary[]>(
-            `${this.baseUrl}/accounts/${customerId}`
+            `${this.baseUrl}/accounts/GetByCustomerId/${customerId}`
           );
         })
       );

@@ -12,9 +12,10 @@
     </div>
 
     <div class="topbar-center">
-      <span class="welcome-text"
+      <!-- <span class="welcome-text"
         >Welcome back, {{ userProfile?.firstName }}</span
-      >
+      > -->
+      <span class="welcome-text">Welcome back</span>
     </div>
 
     <div class="topbar-right">
@@ -30,7 +31,7 @@
 
       <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
         <mat-icon>account_circle</mat-icon>
-        <span class="profile-name">{{ userProfile?.username }}</span>
+        <!-- <span class="profile-name">{{ userProfile?.username }}</span> -->
         <mat-icon>keyboard_arrow_down</mat-icon>
       </button>
 
@@ -38,8 +39,8 @@
         <div class="profile-info">
           <mat-icon>account_circle</mat-icon>
           <div class="user-details">
-            <div class="user-name">{{ userProfile?.username }}</div>
-            <div class="user-email">{{ userProfile?.email }}</div>
+            <!-- <div class="user-name">{{ userProfile?.username }}</div>
+            <div class="user-email">{{ userProfile?.email }}</div> -->
           </div>
         </div>
         <mat-divider></mat-divider>

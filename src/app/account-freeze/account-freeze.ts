@@ -179,7 +179,7 @@ export class AccountFreezeComponent {
 
     // Redirect to accounts list after 2 seconds
     setTimeout(() => {
-      this.router.navigate(['/accounts']);
+      this.router.navigate(['/app/accounts']);
     }, 2000);
   }
 
@@ -340,7 +340,7 @@ export class AccountFreezeComponent {
   }
 
   onCancel() {
-    this.router.navigate(['/accounts']);
+    this.router.navigate(['/app/accounts']);
   }
 
   onUnfreezeAccount() {
@@ -387,14 +387,17 @@ export class AccountFreezeComponent {
 
   onViewAccountDetails() {
     if (this.selectedAccount) {
-      this.router.navigate(['/accounts', this.selectedAccount.accountNumber]);
+      this.router.navigate([
+        '/app/accounts',
+        this.selectedAccount.accountNumber,
+      ]);
     }
   }
 
   onViewTransactionHistory() {
     if (this.selectedAccount) {
       this.router.navigate([
-        '/accounts',
+        '/app/accounts',
         this.selectedAccount.accountNumber,
         'transactions',
       ]);

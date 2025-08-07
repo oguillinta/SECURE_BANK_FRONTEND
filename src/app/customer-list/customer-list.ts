@@ -272,7 +272,7 @@ export class CustomerListComponent {
 
   onEditCustomer(customer: Customer): void {
     console.log('Edit customer:', customer.customerId);
-    this.router.navigate(['/customer-update', customer.customerId]);
+    this.router.navigate(['/app/customer-update', customer.customerId]);
   }
 
   onViewAccounts(customer: Customer): void {
@@ -281,7 +281,7 @@ export class CustomerListComponent {
 
   onCreateAccount(customer: Customer): void {
     console.log('Create account for customer:', customer.customerId);
-    this.router.navigate(['/account-create'], {
+    this.router.navigate(['/app/account-create'], {
       queryParams: { customerId: customer.customerId },
     });
   }

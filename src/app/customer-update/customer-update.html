@@ -25,9 +25,7 @@
             <h1 class="customer-name">
               {{ currentCustomer!.firstName }} {{ currentCustomer!.lastName }}
             </h1>
-            <p class="customer-id">
-              Customer ID: {{ currentCustomer!.customerId }}
-            </p>
+            <p class="customer-id">Customer ID: {{ currentCustomer!.id }}</p>
             <div class="customer-status">
               <mat-chip [ngClass]="getStatusChipClass()">
                 <mat-icon *ngIf="currentCustomer!.status === 'ACTIVE'"

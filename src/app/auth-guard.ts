@@ -6,39 +6,59 @@ import {
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
-import { AuthGuardData, createAuthGuard } from 'keycloak-angular';
+import { MsalService } from '@azure/msal-angular';
 
-const isAccessAllowed = async (
-  route: ActivatedRouteSnapshot,
-  _: RouterStateSnapshot,
-  authData: AuthGuardData
-): Promise<boolean | UrlTree> => {
-  const { authenticated, grantedRoles } = authData;
-
-  const requiredRole = route.data['role'];
-
-  console.log('Local - Roles');
-  console.log(requiredRole);
-
-  console.log('KC - Roles');
-  console.log(authData);
-
-  if (!requiredRole) {
-    return false;
+/**
+ * Helper function to get user roles from MSAL token
+ */
+const getUserRoles = (msalService: MsalService): string[] => {
+  const account = msalService.instance.getActiveAccount();
+  if (account && account.idTokenClaims) {
+    return (account.idTokenClaims as any)['roles'] || [];
   }
+  return [];
+};
 
-  const hasRequiredRole = (role: string): boolean =>
-    Object.values(grantedRoles.resourceRoles).some((roles) =>
-      roles.includes(role)
-    );
+export const canActivateAuthRole: CanActivateFn = (
+  route: ActivatedRouteSnapshot
+) => {
+  const msalService = inject(MsalService);
+  const router = inject(Router);
 
-  if (authenticated && hasRequiredRole(requiredRole)) {
+  const requiredRole = route.data['role'] as string;
+  const requiredRoles = route.data['roles'] as string[];
+  const requireAll = route.data['requireAll'] as boolean;
+
+  const userRoles = getUserRoles(msalService);
+
+  // Check single role
+  if (requiredRole && userRoles.includes(requiredRole)) {
     return true;
   }
 
-  const router = inject(Router);
-  return router.navigate(['/unauthorized']);
-};
+  // Check multiple roles (user needs ANY of these roles)
+  if (
+    requiredRoles &&
+    !requireAll &&
+    requiredRoles.some((role) => userRoles.includes(role))
+  ) {
+    return true;
+  }
 
-export const canActivateAuthRole =
-  createAuthGuard<CanActivateFn>(isAccessAllowed);
+  // Check if requireAll is true (user needs ALL roles)
+  if (
+    requiredRoles &&
+    requireAll &&
+    requiredRoles.every((role) => userRoles.includes(role))
+  ) {
+    return true;
+  }
+
+  console.log('Access denied. User roles:', userRoles);
+  console.log('Required role:', requiredRole);
+  console.log('Required roles:', requiredRoles);
+
+  // Redirect to dashboard or unauthorized page
+  router.navigate(['/unauthorized']);
+  return false;
+};

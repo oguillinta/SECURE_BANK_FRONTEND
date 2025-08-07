@@ -1,34 +1,37 @@
-<router-outlet></router-outlet>
-@if (userProfile) {
-<ng-container>
-  <h2>User information</h2>
-  <table>
-    @if (userProfile.username) {
-    <tr>
-      <th scope="row">Username</th>
-      <td>{{ userProfile!.username }}</td>
-    </tr>
-    } @if (userProfile.firstName) {
-    <tr>
-      <th scope="row">First name</th>
-      <td>{{ userProfile!.firstName }}</td>
-    </tr>
-    } @if (userProfile.lastName) {
-    <tr>
-      <th scope="row">First name</th>
-      <td>{{ userProfile!.lastName }}</td>
-    </tr>
-    } @if (userProfile.email) {
-    <tr>
-      <th scope="row">E-mail</th>
-      <td>{{ userProfile!.email }}</td>
-    </tr>
-    } @if (userProfile.emailVerified) {
-    <tr>
-      <th scope="row">E-mail verified</th>
-      <td>{{ userProfile!.emailVerified ? "Yes" : "No" }}</td>
-    </tr>
+<!-- Only show MSAL toolbar on home/login pages -->
+<!--<div class="app-container" [class.hide-toolbar]="shouldHideToolbar">
+  <mat-toolbar color="primary" *ngIf="!shouldHideToolbar">
+    <a class="title" href="/">{{ title }}</a>
+
+    <div class="toolbar-spacer"></div>
+
+    <a mat-button [routerLink]="['profile']">Profile</a>
+
+    @if (!loginDisplay) {
+    <button mat-raised-button [matMenuTriggerFor]="loginMenu">Login</button>
     }
-  </table>
-</ng-container>
-}
+    <mat-menu #loginMenu="matMenu">
+      <button mat-menu-item (click)="loginRedirect()">
+        Login using Redirect
+      </button>
+      <button mat-menu-item (click)="loginPopup()">Login using Popup</button>
+    </mat-menu>
+
+    @if (loginDisplay) {
+    <button mat-raised-button [matMenuTriggerFor]="logoutMenu">Logout</button>
+    }
+    <mat-menu #logoutMenu="matMenu">
+      <button mat-menu-item (click)="logout()">Logout using Redirect</button>
+      <button mat-menu-item (click)="logout(true)">Logout using Popup</button>
+    </mat-menu>
+  </mat-toolbar>
+-->
+
+<!-- Main Content Area -->
+<div class="container">
+  <!--This is to avoid reload during acquireTokenSilent() because of hidden iframe -->
+  @if (!isIframe) {
+  <router-outlet></router-outlet>
+  }
+</div>
+<!-- </div> -->

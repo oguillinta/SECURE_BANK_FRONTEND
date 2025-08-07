@@ -5,19 +5,33 @@ import { AccountListComponent } from './account-list/account-list';
 import { DashboardComponent } from './dashboard/dashboard';
 import { CustomerUpdateComponent } from './customer-update/customer-update';
 import { AccountFreezeComponent } from './account-freeze/account-freeze';
-import { canActivateAuthRole } from './auth-guard';
+//import { canActivateAuthRole } from './auth-guard';
 import { CustomerListComponent } from './customer-list/customer-list';
 import { AccountCreateComponent } from './account-create/account-create';
 import { AccountSummaryComponent } from './account-summary/account-summary';
+import { HomeComponent } from './home/home';
+import { MsalGuard } from '@azure/msal-angular';
+import { canActivateAuthRole } from './auth-guard';
 
 export const routes: Routes = [
   {
     path: '',
+    component: HomeComponent,
+    pathMatch: 'full',
+  },
+  {
+    path: 'home',
+    component: HomeComponent,
+    pathMatch: 'full',
+  },
+  {
+    path: 'app',
     component: MainLayoutComponent,
+    canActivate: [MsalGuard],
     children: [
       {
         path: '',
-        redirectTo: '/dashboard',
+        redirectTo: 'dashboard',
         pathMatch: 'full',
       },
       {
@@ -28,7 +42,8 @@ export const routes: Routes = [
         path: 'accounts',
         component: AccountListComponent,
         canActivate: [canActivateAuthRole],
-        data: { role: 'ACCOUNT_SUMMARY_VIEWER' },
+        //data: { role: 'ACCOUNT_SUMMARY_VIEWER' },
+        data: { role: 'CUSTOMER_VIEWER' },
       },
       {
         path: 'account-summary',
@@ -68,6 +83,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/dashboard',
+    redirectTo: '',
   },
 ];

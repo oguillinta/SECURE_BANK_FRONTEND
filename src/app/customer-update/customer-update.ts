@@ -96,7 +96,7 @@ export class CustomerUpdateComponent implements OnInit {
     } else {
       // Fallback: check query parameters
       this.route.queryParams.subscribe((params) => {
-        const customerIdParam = params['customerId'];
+        const customerIdParam = params['id'];
         if (customerIdParam) {
           this.customerId = customerIdParam;
           this.loadCustomerData(this.customerId!);
@@ -119,7 +119,7 @@ export class CustomerUpdateComponent implements OnInit {
 
     // Redirect to customer list after 2 seconds
     setTimeout(() => {
-      this.router.navigate(['/customers']);
+      this.router.navigate(['/app/customers']);
     }, 2000);
   }
 
@@ -151,7 +151,7 @@ export class CustomerUpdateComponent implements OnInit {
   private loadSampleCustomerData(): void {
     // Sample data as fallback
     this.currentCustomer = {
-      customerId: 'TEST-003',
+      id: 'TEST-003',
       firstName: 'Michael',
       lastName: 'Brown',
       email: 'michael.brown@email.com',
@@ -167,7 +167,7 @@ export class CustomerUpdateComponent implements OnInit {
   private populateForm(): void {
     if (this.currentCustomer) {
       this.customerForm.patchValue({
-        customerId: this.currentCustomer.customerId,
+        customerId: this.currentCustomer.id,
         firstName: this.currentCustomer.firstName,
         lastName: this.currentCustomer.lastName,
         email: this.currentCustomer.email,
@@ -235,7 +235,7 @@ export class CustomerUpdateComponent implements OnInit {
       this.isLoading = true;
 
       const updateRequest: UpdateCustomerRequest = {
-        customerId: this.currentCustomer.customerId,
+        customerId: this.currentCustomer.id,
         firstName: this.customerForm.get('firstName')?.value,
         lastName: this.customerForm.get('lastName')?.value,
         email: this.customerForm.get('email')?.value,
@@ -312,8 +312,8 @@ export class CustomerUpdateComponent implements OnInit {
   onViewAccounts() {
     if (this.currentCustomer) {
       this.router.navigate([
-        '/customers',
-        this.currentCustomer.customerId,
+        '/app/customers',
+        this.currentCustomer.id,
         'accounts',
       ]);
     }
@@ -322,18 +322,15 @@ export class CustomerUpdateComponent implements OnInit {
   onViewTransactions() {
     if (this.currentCustomer) {
       this.router.navigate([
-        '/customers',
-        this.currentCustomer.customerId,
+        '/app/customers',
+        this.currentCustomer.id,
         'transactions',
       ]);
     }
   }
 
   onGenerateReport() {
-    console.log(
-      'Generate customer report for:',
-      this.currentCustomer?.customerId
-    );
+    console.log('Generate customer report for:', this.currentCustomer?.id);
     // Implement report generation
   }
 
