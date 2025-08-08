@@ -181,9 +181,7 @@ export class AccountCreateComponent implements OnInit {
   getAllFilteredCustomers(): void {
     this.customerService.getAll().subscribe({
       next: (customers) => {
-        this.filteredCustomers = customers.filter(
-          (customer) => customer.status === 'ACTIVE'
-        );
+        this.filteredCustomers = customers
       },
       error: (error: any) => {
         console.log(error);
