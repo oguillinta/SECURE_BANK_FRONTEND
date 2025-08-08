@@ -1,6 +1,6 @@
 export const environment = {
   baseUrl: 'http://securebankapi-b5azhzhmd6cff7gm.eastus2-01.azurewebsites.net',
-  production: false,
+  production: true,
   msalConfig: {
     auth: {
       clientId: '5c8bbff7-c20e-4b31-b0f9-38fa62a21ec1',
