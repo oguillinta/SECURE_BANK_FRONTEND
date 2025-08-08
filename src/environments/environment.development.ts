@@ -1,5 +1,5 @@
 export const environment = {
-  baseUrl: 'http://securebankapi-b5azhzhmd6cff7gm.eastus2-01.azurewebsites.net',
+  baseUrl: 'https://securebankapi-b5azhzhmd6cff7gm.eastus2-01.azurewebsites.net',
   production: true,
   msalConfig: {
     auth: {
