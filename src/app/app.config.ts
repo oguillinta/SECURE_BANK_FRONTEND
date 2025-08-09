@@ -65,11 +65,6 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
     environment.apiConfig.uri,
     environment.apiConfig.scopes
   );
-  protectedResourceMap.set('http://localhost:5036/', [
-    'openid',
-    'profile',
-    'email',
-  ]);
 
   return {
     interactionType: InteractionType.Redirect,
